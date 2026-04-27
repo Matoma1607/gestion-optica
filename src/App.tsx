@@ -76,6 +76,38 @@ const LOGISTICS_OUT: { id: string; destination: string; exitTime: string; items:
   { id: '#10385', destination: 'Solmar Alem', exitTime: '04:00 p. m.', items: ['Lente de Contacto', 'Líquido Limpieza'] },
 ];
 
+const SmartTooltip: React.FC<{ text: string; children: React.ReactNode; position?: 'top' | 'bottom' | 'side' }> = ({ text, children, position = 'top' }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div 
+      className="relative" 
+      onMouseEnter={() => setIsHovered(true)} 
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {children}
+      <AnimatePresence>
+        {isHovered && (
+          <motion.div
+            initial={{ opacity: 0, y: position === 'top' ? 10 : -10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: position === 'top' ? 5 : -5, scale: 0.95 }}
+            className={`absolute z-[100] ${
+              position === 'top' ? 'bottom-full mb-3' : 'top-full mt-3'
+            } left-1/2 -translate-x-1/2 px-4 py-2 bg-brand-blue text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-2xl border border-white/10 whitespace-nowrap pointer-events-none flex items-center gap-2`}
+          >
+            <div className="h-1.5 w-1.5 rounded-full bg-brand-green animate-pulse"></div>
+            {text}
+            <div className={`absolute ${
+              position === 'top' ? 'top-full border-t-brand-blue' : 'bottom-full border-b-brand-blue'
+            } left-1/2 -translate-x-1/2 border-[6px] border-transparent`} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
 // --- Sub-components ---
 
 const RealTimeClock: React.FC = () => {
@@ -196,53 +228,56 @@ const LogisticsOutSection: React.FC<{ onOpenHistory: () => void }> = ({ onOpenHi
       </div>
       
       <div className="space-y-4 flex-1">
-        {LOGISTICS_OUT.map((job: { id: string; destination: string; exitTime: string; items: string[] }, idx: number) => (
-          <motion.div 
-            key={job.id}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: idx * 0.1 }}
-            className="group flex flex-col bg-white/5 p-4 rounded-3xl border border-white/10 hover:bg-white/10 transition-all hover:border-brand-green/30 cursor-default gap-3"
-          >
-            <div className="flex items-center justify-between w-full">
-              <div className="flex items-center gap-4">
-                <div className="h-10 w-10 rounded-2xl bg-brand-green/20 flex items-center justify-center text-brand-green group-hover:scale-110 transition-transform">
-                  <Truck size={18} />
+        {LOGISTICS_OUT.map((job, idx) => (
+          <SmartTooltip key={job.id} text={`Envío a sucursal ${job.destination}`} position="side">
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: idx * 0.1 }}
+              className="group flex flex-col bg-white/5 p-4 rounded-3xl border border-white/10 hover:bg-white/10 transition-all hover:border-brand-green/30 cursor-default gap-3"
+            >
+              <div className="flex items-center justify-between w-full">
+                <div className="flex items-center gap-4">
+                  <div className="h-10 w-10 rounded-2xl bg-brand-green/20 flex items-center justify-center text-brand-green group-hover:scale-110 transition-transform">
+                    <Truck size={18} />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] text-slate-500 font-mono tracking-widest uppercase font-black">ORDEN</span>
+                    <span className="text-lg font-black text-brand-green tracking-tight">{job.id.replace('#', '')}</span>
+                  </div>
                 </div>
-                <div className="flex flex-col">
-                  <span className="text-[10px] text-slate-500 font-mono tracking-widest uppercase font-black">ORDEN</span>
-                  <span className="text-lg font-black text-brand-green tracking-tight">{job.id.replace('#', '')}</span>
+                
+                <div className="text-right flex flex-col">
+                  <div className="flex flex-col items-end">
+                    <span className="text-[8px] text-slate-500 font-black uppercase tracking-widest mb-0.5">Sucursal</span>
+                    <span className="text-[10px] text-brand-green font-black uppercase tracking-widest px-2 py-0.5 bg-brand-green/10 rounded-md border border-brand-green/20">{job.destination}</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-slate-400 mt-1 font-bold">{job.exitTime.replace(' p. m.', ' PM').replace(' a. m.', ' AM')}</span>
                 </div>
               </div>
-              
-              <div className="text-right flex flex-col">
-                <div className="flex flex-col items-end">
-                  <span className="text-[8px] text-slate-500 font-black uppercase tracking-widest mb-0.5">Sucursal</span>
-                  <span className="text-[10px] text-brand-green font-black uppercase tracking-widest px-2 py-0.5 bg-brand-green/10 rounded-md border border-brand-green/20">{job.destination}</span>
-                </div>
-                <span className="text-[10px] font-mono text-slate-400 mt-1 font-bold">{job.exitTime.replace(' p. m.', ' PM').replace(' a. m.', ' AM')}</span>
-              </div>
-            </div>
 
-            <div className="flex flex-wrap gap-2 border-t border-white/5 pt-3 mt-1">
-              {job.items.map((item, i) => (
-                <span key={i} className="text-[9px] bg-white/5 text-slate-300 px-2 py-1 rounded-lg border border-white/5 group-hover:border-white/10 transition-colors uppercase font-bold tracking-wider">
-                  {item}
-                </span>
-              ))}
-            </div>
-          </motion.div>
+              <div className="flex flex-wrap gap-2 border-t border-white/5 pt-3 mt-1">
+                {job.items.map((item, i) => (
+                  <span key={i} className="text-[9px] bg-white/5 text-slate-300 px-2 py-1 rounded-lg border border-white/5 group-hover:border-white/10 transition-colors uppercase font-bold tracking-wider">
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </motion.div>
+          </SmartTooltip>
         ))}
       </div>
 
-      <button 
-        onClick={onOpenHistory}
-        className="mt-8 w-full group relative py-4 flex items-center justify-center gap-3 text-sm font-black text-white transition-all overflow-hidden"
-      >
-        <div className="absolute inset-0 bg-brand-green/20 rounded-2xl group-hover:bg-brand-green/30 transition-colors"></div>
-        <span className="relative z-10 uppercase tracking-widest text-brand-green">Ver Historial</span>
-        <ArrowRight size={18} className="relative z-10 text-brand-green group-hover:translate-x-1 transition-transform" />
-      </button>
+      <SmartTooltip text="Consulta el registro histórico de salidas" position="bottom">
+        <button 
+          onClick={onOpenHistory}
+          className="mt-8 w-full group relative py-4 flex items-center justify-center gap-3 text-sm font-black text-white transition-all overflow-hidden"
+        >
+          <div className="absolute inset-0 bg-brand-green/20 rounded-2xl group-hover:bg-brand-green/30 transition-colors"></div>
+          <span className="relative z-10 uppercase tracking-widest text-brand-green">Ver Historial</span>
+          <ArrowRight size={18} className="relative z-10 text-brand-green group-hover:translate-x-1 transition-transform" />
+        </button>
+      </SmartTooltip>
     </div>
   </div>
 );
@@ -312,22 +347,27 @@ export default function App() {
           {/* Tarjetas de Etapas (3x2 Grid) */}
           <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
             {stats.map((stat: { stage: string; count: number; total: number }, idx: number) => (
-              <StageProgressCard 
+              <SmartTooltip 
                 key={stat.stage} 
-                stage={stat.stage} 
-                count={stat.count} 
-                total={stat.total}
-                isSelected={selectedStage === stat.stage}
-                onClick={() => setSelectedStage(selectedStage === stat.stage ? null : stat.stage as Stage)}
-                icon={getStageIcon(stat.stage as Stage)}
-                colorClass={
-                  idx === 0 ? 'bg-blue-500' : 
-                  idx === 1 ? 'bg-indigo-500' : 
-                  idx === 2 ? 'bg-purple-500' : 
-                  idx === 3 ? 'bg-pink-500' : 
-                  idx === 4 ? 'bg-brand-green' : 'bg-brand-orange'
-                }
-              />
+                text={`Pedidos esperando en ${stat.stage}`}
+                position="bottom"
+              >
+                <StageProgressCard 
+                  stage={stat.stage} 
+                  count={stat.count} 
+                  total={stat.total}
+                  isSelected={selectedStage === stat.stage}
+                  onClick={() => setSelectedStage(selectedStage === stat.stage ? null : stat.stage as Stage)}
+                  icon={getStageIcon(stat.stage as Stage)}
+                  colorClass={
+                    idx === 0 ? 'bg-blue-500' : 
+                    idx === 1 ? 'bg-indigo-500' : 
+                    idx === 2 ? 'bg-purple-500' : 
+                    idx === 3 ? 'bg-pink-500' : 
+                    idx === 4 ? 'bg-brand-green' : 'bg-brand-orange'
+                  }
+                />
+              </SmartTooltip>
             ))}
           </div>
 
@@ -361,26 +401,34 @@ export default function App() {
             
             <div className="flex bg-slate-100 p-1 rounded-2xl overflow-x-auto">
               {(['Todas', 'Vencidas', 'En Riesgo'] as const).map((f: 'Todas' | 'Vencidas' | 'En Riesgo') => (
-                <button
-                  key={f}
-                  onClick={() => setFilter(f)}
-                  className={`px-5 py-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 ${
-                    filter === f 
-                      ? 'bg-white text-slate-900 shadow-md transform scale-105' 
-                      : 'text-slate-500 hover:text-slate-700'
-                  }`}
+                <SmartTooltip 
+                  key={f} 
+                  text={
+                    f === 'Todas' ? 'Ver todo el listado' : 
+                    f === 'Vencidas' ? 'Pedidos fuera de tiempo (≤0m)' : 
+                    'Zona crítica (Tolerancia ≤60m)'
+                  }
                 >
-                  <span>{f}</span>
-                  {filterCounts[f] > 0 && (
-                    <span className={`flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-black ${
-                      f === 'Vencidas' ? 'bg-brand-red text-white' : 
-                      f === 'En Riesgo' ? 'bg-brand-orange text-white' : 
-                      'bg-slate-200 text-slate-600'
-                    }`}>
-                      {filterCounts[f]}
-                    </span>
-                  )}
-                </button>
+                  <button
+                    onClick={() => setFilter(f)}
+                    className={`px-5 py-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 ${
+                      filter === f 
+                        ? 'bg-white text-slate-900 shadow-md transform scale-105' 
+                        : 'text-slate-500 hover:text-slate-700'
+                    }`}
+                  >
+                    <span>{f}</span>
+                    {filterCounts[f] > 0 && (
+                      <span className={`flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-black ${
+                        f === 'Vencidas' ? 'bg-brand-red text-white' : 
+                        f === 'En Riesgo' ? 'bg-brand-orange text-white' : 
+                        'bg-slate-200 text-slate-600'
+                      }`}>
+                        {filterCounts[f]}
+                      </span>
+                    )}
+                  </button>
+                </SmartTooltip>
               ))}
             </div>
           </div>
@@ -442,9 +490,15 @@ export default function App() {
                                   </span>
                                 </td>
                                 <td className="px-6 py-4 text-right">
-                                  <span className={`text-[9px] font-black px-2 py-1 rounded-full uppercase tracking-tighter ${getStatusColor(order.status)}`}>
-                                    {order.status}
-                                  </span>
+                                  <SmartTooltip text={
+                                    order.status === 'Vencida' ? 'Atención inmediata requerida' :
+                                    order.status === 'En Riesgo' ? 'Tolerancia de 1 hora. Entrando en zona crítica.' :
+                                    'Pedido dentro del rango normal'
+                                  }>
+                                    <span className={`text-[9px] font-black px-2 py-1 rounded-full uppercase tracking-tighter ${getStatusColor(order.status)}`}>
+                                      {order.status}
+                                    </span>
+                                  </SmartTooltip>
                                 </td>
                               </motion.tr>
                             ))
@@ -530,45 +584,47 @@ export default function App() {
 
               <div className="flex-1 overflow-y-auto p-8 space-y-4 bg-slate-50/50">
                 {LOGISTICS_OUT.concat(LOGISTICS_OUT).map((job, idx) => (
-                  <motion.div 
-                    key={idx} 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.05 }}
-                    className="flex flex-col bg-white p-5 rounded-3xl border border-slate-100 hover:border-brand-blue/20 transition-all shadow-sm group"
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-4">
-                        <div className="h-12 w-12 rounded-2xl bg-brand-blue/5 flex items-center justify-center text-brand-blue group-hover:scale-105 transition-transform">
-                          <Truck size={24} className="text-brand-green" />
+                  <SmartTooltip key={idx} text="Registro histórico del envío">
+                    <motion.div 
+                      key={idx} 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.05 }}
+                      className="flex flex-col bg-white p-5 rounded-3xl border border-slate-100 hover:border-brand-blue/20 transition-all shadow-sm group"
+                    >
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-4">
+                          <div className="h-12 w-12 rounded-2xl bg-brand-blue/5 flex items-center justify-center text-brand-blue group-hover:scale-105 transition-transform">
+                            <Truck size={24} className="text-brand-green" />
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Orden de Salida</p>
+                            <p className="text-xl font-black text-brand-blue tracking-tight">{job.id.replace('#', '')}</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Orden de Salida</p>
-                          <p className="text-xl font-black text-brand-blue tracking-tight">{job.id.replace('#', '')}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Sucursal Destino</p>
-                        <span className="text-[10px] bg-brand-blue text-white px-3 py-1 rounded-full font-black uppercase tracking-tighter shadow-sm border border-brand-blue/10">
-                          {job.destination}
-                        </span>
-                        <p className="text-[10px] font-mono text-slate-400 mt-2 font-bold flex items-center justify-end gap-1">
-                          <Clock size={10} /> {job.exitTime}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 gap-2 pt-4 border-t border-slate-50">
-                      <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-1">Contenido del paquete</p>
-                      <div className="flex flex-wrap gap-2">
-                        {job.items.map((item, i) => (
-                          <span key={i} className="text-[9px] font-black text-slate-600 bg-slate-100 border border-slate-200 px-3 py-1 rounded-lg uppercase tracking-wider group-hover:bg-brand-blue group-hover:text-white group-hover:border-brand-blue transition-colors">
-                            {item}
+                        <div className="text-right">
+                          <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Sucursal Destino</p>
+                          <span className="text-[10px] bg-brand-blue text-white px-3 py-1 rounded-full font-black uppercase tracking-tighter shadow-sm border border-brand-blue/10">
+                            {job.destination}
                           </span>
-                        ))}
+                          <p className="text-[10px] font-mono text-slate-400 mt-2 font-bold flex items-center justify-end gap-1">
+                            <Clock size={10} /> {job.exitTime}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </motion.div>
+                      
+                      <div className="grid grid-cols-1 gap-2 pt-4 border-t border-slate-50">
+                        <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-1">Contenido del paquete</p>
+                        <div className="flex flex-wrap gap-2">
+                          {job.items.map((item, i) => (
+                            <span key={i} className="text-[9px] font-black text-slate-600 bg-slate-100 border border-slate-200 px-3 py-1 rounded-lg uppercase tracking-wider group-hover:bg-brand-blue group-hover:text-white group-hover:border-brand-blue transition-colors">
+                              {item}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </motion.div>
+                  </SmartTooltip>
                 ))}
               </div>
 
