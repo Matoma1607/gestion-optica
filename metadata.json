@@ -1,5 +1,5 @@
 {
-  "name": "Optical Lab Control Panel",
+  "name": "Gestión Óptica",
   "description": "A logistics management dashboard for an optical laboratory, featuring real-time tracking, critical order summaries, and stage progress indicators.",
   "requestFramePermissions": [],
   "majorCapabilities": []
