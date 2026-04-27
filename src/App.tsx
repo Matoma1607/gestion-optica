@@ -255,6 +255,12 @@ export default function App() {
     }));
   }, [orders]);
 
+  const filterCounts = useMemo(() => ({
+    Todas: orders.length,
+    Vencidas: orders.filter(o => o.status === 'Vencida').length,
+    'En Riesgo': orders.filter(o => o.status === 'En Riesgo').length,
+  }), [orders]);
+
   const getStatusColor = (status: Status) => {
     switch (status) {
       case 'Vencida': return 'bg-brand-red text-white';
@@ -338,13 +344,22 @@ export default function App() {
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
-                  className={`px-5 py-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
+                  className={`px-5 py-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 ${
                     filter === f 
                       ? 'bg-white text-slate-900 shadow-md transform scale-105' 
                       : 'text-slate-500 hover:text-slate-700'
                   }`}
                 >
-                  {f}
+                  <span>{f}</span>
+                  {filterCounts[f] > 0 && (
+                    <span className={`flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-black ${
+                      f === 'Vencidas' ? 'bg-brand-red text-white' : 
+                      f === 'En Riesgo' ? 'bg-brand-orange text-white' : 
+                      'bg-slate-200 text-slate-600'
+                    }`}>
+                      {filterCounts[f]}
+                    </span>
+                  )}
                 </button>
               ))}
             </div>
