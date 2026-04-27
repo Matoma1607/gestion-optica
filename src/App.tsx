@@ -284,7 +284,7 @@ export default function App() {
     <div className="min-h-screen pb-12 flex flex-col bg-slate-50">
       <Header />
       
-      <main className="flex-1 max-w-[1600px] mx-auto w-full px-6 mt-8 space-y-8">
+      <main className="flex-1 w-full px-4 mt-6 space-y-6">
         
         {/* Top Section: Progress Cards (3x2) and Sidebar */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
