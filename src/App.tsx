@@ -84,12 +84,30 @@ const RealTimeClock: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
+  const formatTimeParts = (date: Date) => {
+    const timeStr = date.toLocaleTimeString('en-US', { 
+      hour12: true, 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      second: '2-digit' 
+    });
+    const [time, period] = timeStr.split(' ');
+    return { time, period };
+  };
+
+  const { time: timeText, period } = formatTimeParts(time);
+
   return (
-    <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 shadow-sm">
-      <Clock size={16} className="text-white" />
-      <span className="font-mono font-medium text-white tracking-widest text-lg">
-        {time.toLocaleTimeString([], { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-      </span>
+    <div className="flex items-center gap-3 bg-white/10 backdrop-blur-md px-5 py-2.5 rounded-full border border-white/20 shadow-lg min-w-[210px] justify-center">
+      <Clock size={16} className="text-brand-green animate-pulse" />
+      <div className="flex items-baseline gap-1.5 font-mono">
+        <span className="text-white font-black tracking-widest text-xl tabular-nums">
+          {timeText}
+        </span>
+        <span className="text-brand-green/80 text-[10px] font-black uppercase tracking-tighter w-6">
+          {period}
+        </span>
+      </div>
     </div>
   );
 };
