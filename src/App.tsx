@@ -76,12 +76,12 @@ const LOGISTICS_OUT: { id: string; destination: string; exitTime: string; items:
   { id: '#10385', destination: 'Solmar Alem', exitTime: '04:00 p. m.', items: ['Lente de Contacto', 'Líquido Limpieza'] },
 ];
 
-const SmartTooltip: React.FC<{ text: string; children: React.ReactNode; position?: 'top' | 'bottom' | 'side' }> = ({ text, children, position = 'top' }) => {
+const SmartTooltip: React.FC<{ text: string; children: React.ReactNode; position?: 'top' | 'bottom' | 'side'; className?: string }> = ({ text, children, position = 'top', className = '' }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
     <div 
-      className="relative" 
+      className={`relative ${className}`} 
       onMouseEnter={() => setIsHovered(true)} 
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -89,18 +89,36 @@ const SmartTooltip: React.FC<{ text: string; children: React.ReactNode; position
       <AnimatePresence>
         {isHovered && (
           <motion.div
-            initial={{ opacity: 0, y: position === 'top' ? 10 : -10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: position === 'top' ? 5 : -5, scale: 0.95 }}
+            initial={{ 
+              opacity: 0, 
+              x: position === 'side' ? -10 : '-50%',
+              y: position === 'top' ? 10 : position === 'bottom' ? -10 : '-50%',
+              scale: 0.95 
+            }}
+            animate={{ 
+              opacity: 1, 
+              x: position === 'side' ? -20 : '-50%',
+              y: position === 'top' ? 0 : position === 'bottom' ? 0 : '-50%',
+              scale: 1 
+            }}
+            exit={{ 
+              opacity: 0, 
+              scale: 0.95 
+            }}
+            transition={{ duration: 0.1 }}
             className={`absolute z-[100] ${
-              position === 'top' ? 'bottom-full mb-3' : 'top-full mt-3'
-            } left-1/2 -translate-x-1/2 px-4 py-2 bg-brand-blue text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-2xl border border-white/10 whitespace-nowrap pointer-events-none flex items-center gap-2`}
+              position === 'top' ? 'bottom-full mb-3 left-1/2' : 
+              position === 'bottom' ? 'top-full mt-3 left-1/2' : 
+              'right-full mr-4 top-1/2'
+            } px-4 py-2 bg-brand-blue text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-2xl border border-white/10 whitespace-nowrap pointer-events-none flex items-center gap-2`}
           >
             <div className="h-1.5 w-1.5 rounded-full bg-brand-green animate-pulse"></div>
             {text}
             <div className={`absolute ${
-              position === 'top' ? 'top-full border-t-brand-blue' : 'bottom-full border-b-brand-blue'
-            } left-1/2 -translate-x-1/2 border-[6px] border-transparent`} />
+              position === 'top' ? 'top-full left-1/2 -translate-x-1/2 border-t-brand-blue' : 
+              position === 'bottom' ? 'bottom-full left-1/2 -translate-x-1/2 border-b-brand-blue' : 
+              'left-full top-1/2 -translate-y-1/2 border-l-brand-blue'
+            } border-[6px] border-transparent`} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -229,7 +247,7 @@ const LogisticsOutSection: React.FC<{ onOpenHistory: () => void }> = ({ onOpenHi
       
       <div className="space-y-4 flex-1">
         {LOGISTICS_OUT.map((job, idx) => (
-          <SmartTooltip key={job.id} text={`Envío a sucursal ${job.destination}`} position="side">
+          <SmartTooltip key={job.id} text={`Envío a sucursal ${job.destination}`} position="side" className="w-full">
             <motion.div 
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -449,7 +467,7 @@ export default function App() {
                           <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">Estado</th>
                         </tr>
                       </thead>
-                      <AnimatePresence mode="wait">
+                      <AnimatePresence>
                         <motion.tbody 
                           key={`${panelIdx}-${filter}-${selectedStage}`}
                           className="divide-y divide-slate-50"
