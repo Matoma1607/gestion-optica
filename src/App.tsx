@@ -67,11 +67,11 @@ const INITIAL_ORDERS: Order[] = [
   { id: '#10082', location: '24 de Septiembre', promisedTime: '14:23', stage: 'Control Final', remainingTime: 23, status: 'Vencida' },
 ];
 
-const LOGISTICS_OUT: { id: string; destination: string; exitTime: string }[] = [
-  { id: '#10056', destination: 'Centro', exitTime: '12:10 p. m.' },
-  { id: '#10112', destination: 'Norte', exitTime: '03:55 p. m.' },
-  { id: '#10166', destination: 'Centro', exitTime: '03:55 p. m.' },
-  { id: '#10385', destination: 'Centro', exitTime: '04:00 p. m.' },
+const LOGISTICS_OUT: { id: string; destination: string; exitTime: string; items: string[] }[] = [
+  { id: '#10056', destination: 'Centro', exitTime: '12:10 p. m.', items: ['Multifocal Blue Cut', 'Armazón Acetato'] },
+  { id: '#10112', destination: 'Norte', exitTime: '03:55 p. m.', items: ['Orgánico Blanco', 'Reparación Patilla'] },
+  { id: '#10166', destination: 'Centro', exitTime: '03:55 p. m.', items: ['Policarbonato AR', 'Estuche Rígido'] },
+  { id: '#10385', destination: 'Centro', exitTime: '04:00 p. m.', items: ['Lente de Contacto', 'Líquido Limpieza'] },
 ];
 
 // --- Sub-components ---
@@ -194,27 +194,37 @@ const LogisticsOutSection: React.FC = () => (
       </div>
       
       <div className="space-y-4 flex-1">
-        {LOGISTICS_OUT.map((job: { id: string; destination: string; exitTime: string }, idx: number) => (
+        {LOGISTICS_OUT.map((job: { id: string; destination: string; exitTime: string; items: string[] }, idx: number) => (
           <motion.div 
             key={job.id}
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: idx * 0.1 }}
-            className="group flex items-center justify-between bg-white/5 p-4 rounded-2xl border border-white/10 hover:bg-white/10 transition-all hover:border-brand-green/30 cursor-default"
+            className="group flex flex-col bg-white/5 p-4 rounded-3xl border border-white/10 hover:bg-white/10 transition-all hover:border-brand-green/30 cursor-default gap-3"
           >
-            <div className="flex items-center gap-4">
-              <div className="h-10 w-10 rounded-xl bg-brand-green/20 flex items-center justify-center text-brand-green">
-                <CheckCircle2 size={18} />
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center gap-4">
+                <div className="h-10 w-10 rounded-2xl bg-brand-green/20 flex items-center justify-center text-brand-green group-hover:scale-110 transition-transform">
+                  <CheckCircle2 size={18} />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-slate-500 font-mono tracking-widest uppercase font-black">ORDEN</span>
+                  <span className="text-lg font-black text-brand-green tracking-tight">{job.id.replace('#', '')}</span>
+                </div>
               </div>
-              <div className="flex flex-col">
-                <span className="text-xs text-slate-400 font-mono tracking-tighter opacity-70">ORDEN #</span>
-                <span className="text-sm font-black text-brand-green">{job.id.replace('#', '')}</span>
+              
+              <div className="text-right flex flex-col">
+                <span className="text-[10px] text-brand-green font-black uppercase tracking-widest px-2 py-0.5 bg-brand-green/10 rounded-md border border-brand-green/20">{job.destination}</span>
+                <span className="text-[10px] font-mono text-slate-400 mt-1 font-bold">{job.exitTime.replace(' p. m.', ' PM').replace(' a. m.', ' AM')}</span>
               </div>
             </div>
-            
-            <div className="text-right flex flex-col">
-              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{job.destination}</span>
-              <span className="text-xs font-mono text-slate-200 mt-1">{job.exitTime.replace(' p. m.', ' PM').replace(' a. m.', ' AM')}</span>
+
+            <div className="flex flex-wrap gap-2 border-t border-white/5 pt-3 mt-1">
+              {job.items.map((item, i) => (
+                <span key={i} className="text-[9px] bg-white/5 text-slate-300 px-2 py-1 rounded-lg border border-white/5 group-hover:border-white/10 transition-colors uppercase font-bold tracking-wider">
+                  {item}
+                </span>
+              ))}
             </div>
           </motion.div>
         ))}
