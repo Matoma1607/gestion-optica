@@ -15,6 +15,8 @@ import {
   Activity,
   Layers,
   Wrench,
+  History,
+  X,
   LucideIcon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -182,7 +184,7 @@ function StageProgressCard({ stage, count, total, colorClass, icon: Icon, isSele
   );
 }
 
-const LogisticsOutSection: React.FC = () => (
+const LogisticsOutSection: React.FC<{ onOpenHistory: () => void }> = ({ onOpenHistory }) => (
   <div className="bg-slate-900 text-white p-6 rounded-[2.5rem] shadow-2xl flex flex-col h-full border border-white/5 relative overflow-hidden">
     <div className="absolute top-0 right-0 w-32 h-32 bg-brand-green/10 blur-3xl rounded-full -mr-10 -mt-10"></div>
     <div className="relative z-10 flex flex-col h-full">
@@ -230,7 +232,10 @@ const LogisticsOutSection: React.FC = () => (
         ))}
       </div>
 
-      <button className="mt-8 w-full group relative py-4 flex items-center justify-center gap-3 text-sm font-black text-white transition-all overflow-hidden">
+      <button 
+        onClick={onOpenHistory}
+        className="mt-8 w-full group relative py-4 flex items-center justify-center gap-3 text-sm font-black text-white transition-all overflow-hidden"
+      >
         <div className="absolute inset-0 bg-brand-green/20 rounded-2xl group-hover:bg-brand-green/30 transition-colors"></div>
         <span className="relative z-10 uppercase tracking-widest text-brand-green">Ver Historial</span>
         <ArrowRight size={18} className="relative z-10 text-brand-green group-hover:translate-x-1 transition-transform" />
@@ -243,6 +248,7 @@ const LogisticsOutSection: React.FC = () => (
 
 export default function App() {
   const [filter, setFilter] = useState<'Todas' | 'Vencidas' | 'En Riesgo'>('Todas');
+  const [showHistory, setShowHistory] = useState(false);
   const [selectedStage, setSelectedStage] = useState<Stage | null>(null);
   const [orders] = useState<Order[]>(INITIAL_ORDERS);
 
@@ -323,7 +329,7 @@ export default function App() {
 
           {/* Panel Lateral de Logística */}
           <div className="lg:col-span-4 h-full">
-            <LogisticsOutSection />
+            <LogisticsOutSection onOpenHistory={() => setShowHistory(true)} />
           </div>
         </div>
 
@@ -484,6 +490,95 @@ export default function App() {
         </section>
 
       </main>
+
+      {/* History Modal Overlay */}
+      <AnimatePresence>
+        {showHistory && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowHistory(false)}
+              className="absolute inset-0 bg-brand-blue/80 backdrop-blur-md"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
+            >
+              <div className="p-8 bg-brand-blue text-white flex justify-between items-center relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-brand-green/10 blur-3xl rounded-full -mr-10 -mt-10"></div>
+                <div className="relative z-10">
+                  <h2 className="text-2xl font-black tracking-tight flex items-center gap-3 italic">
+                    <History className="text-brand-green" /> HISTORIAL DE SALIDAS
+                  </h2>
+                  <p className="text-white/60 text-[10px] font-black uppercase tracking-widest mt-1">Registros de las últimas 24 horas</p>
+                </div>
+                <button 
+                  onClick={() => setShowHistory(false)}
+                  className="relative z-10 bg-white/10 hover:bg-white/20 p-2 rounded-xl transition-all"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-8 space-y-4 bg-slate-50/50">
+                {LOGISTICS_OUT.concat(LOGISTICS_OUT).map((job, idx) => (
+                  <motion.div 
+                    key={idx} 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.05 }}
+                    className="flex flex-col bg-white p-5 rounded-3xl border border-slate-100 hover:border-brand-blue/20 transition-all shadow-sm group"
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-4">
+                        <div className="h-12 w-12 rounded-2xl bg-brand-blue/5 flex items-center justify-center text-brand-blue group-hover:scale-105 transition-transform">
+                          <CheckCircle2 size={24} className="text-brand-green" />
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Orden</p>
+                          <p className="text-xl font-black text-brand-blue tracking-tight">{job.id.replace('#', '')}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[10px] bg-brand-blue text-white px-3 py-1 rounded-full font-black uppercase tracking-tighter shadow-sm border border-brand-blue/10">
+                          {job.destination}
+                        </span>
+                        <p className="text-[10px] font-mono text-slate-400 mt-2 font-bold flex items-center justify-end gap-1">
+                          <Clock size={10} /> {job.exitTime}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 gap-2 pt-4 border-t border-slate-50">
+                      <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-1">Contenido del paquete</p>
+                      <div className="flex flex-wrap gap-2">
+                        {job.items.map((item, i) => (
+                          <span key={i} className="text-[9px] font-black text-slate-600 bg-slate-100 border border-slate-200 px-3 py-1 rounded-lg uppercase tracking-wider group-hover:bg-brand-blue group-hover:text-white group-hover:border-brand-blue transition-colors">
+                            {item}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              <div className="p-6 bg-white border-t border-slate-100 text-center">
+                <button 
+                  onClick={() => setShowHistory(false)}
+                  className="bg-slate-100 hover:bg-slate-200 text-slate-500 px-8 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all"
+                >
+                  Cerrar Historial
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       <footer className="mt-auto py-10 text-center text-slate-400 text-xs font-medium">
         <p>© 2026 Sistema de Gestión de Laboratorio Óptico v1.0.0-Beta</p>
