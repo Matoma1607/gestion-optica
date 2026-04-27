@@ -255,7 +255,8 @@ export default function App() {
   const filteredOrders = useMemo(() => {
     let result = orders;
     if (filter !== 'Todas') {
-      result = result.filter(order => order.status === filter);
+      const statusToFilter = filter === 'Vencidas' ? 'Vencida' : filter;
+      result = result.filter(order => order.status === statusToFilter);
     }
     if (selectedStage) {
       result = result.filter(order => order.stage === selectedStage);
