@@ -391,55 +391,53 @@ export default function App() {
                           <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">Estado</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-50">
-                        <AnimatePresence mode="wait">
+                      <AnimatePresence mode="wait">
+                        <motion.tbody 
+                          key={`${panelIdx}-${filter}-${selectedStage}`}
+                          className="divide-y divide-slate-50"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.15 }}
+                        >
                           {panelOrders.length > 0 ? (
-                            <motion.div 
-                              key={`${panelIdx}-${filter}`}
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              exit={{ opacity: 0 }}
-                              transition={{ duration: 0.1 }}
-                              style={{ display: 'contents' }}
-                            >
-                              {panelOrders.map((order: Order, idx: number) => (
-                                <motion.tr 
-                                  key={order.id}
-                                  initial={{ opacity: 0, y: 5 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  transition={{ delay: idx * 0.02 }}
-                                  className="hover:bg-slate-50/80 transition-colors group"
-                                >
-                                  <td className="px-6 py-4 font-mono text-xs font-bold text-brand-blue">{order.id}</td>
-                                  <td className="px-6 py-4">
-                                    <div className="flex flex-col">
-                                      <span className="text-xs font-semibold text-slate-700 truncate max-w-[120px]">{order.location}</span>
-                                      <span className="text-[9px] text-slate-400 font-mono tracking-tighter flex items-center gap-1">
-                                        <Clock size={8} /> {order.promisedTime}
-                                      </span>
-                                    </div>
-                                  </td>
-                                  <td className="px-6 py-4">
-                                    <span className="text-[10px] font-medium px-2 py-0.5 bg-slate-100 rounded-md text-slate-600 border border-slate-200">
-                                      {order.stage}
+                            panelOrders.map((order: Order, idx: number) => (
+                              <motion.tr 
+                                key={order.id}
+                                initial={{ opacity: 0, y: 5 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: idx * 0.02 }}
+                                className="hover:bg-slate-50/80 transition-colors group"
+                              >
+                                <td className="px-6 py-4 font-mono text-xs font-bold text-brand-blue">{order.id}</td>
+                                <td className="px-6 py-4">
+                                  <div className="flex flex-col">
+                                    <span className="text-xs font-semibold text-slate-700 truncate max-w-[120px]">{order.location}</span>
+                                    <span className="text-[9px] text-slate-400 font-mono tracking-tighter flex items-center gap-1">
+                                      <Clock size={8} /> {order.promisedTime}
                                     </span>
-                                  </td>
-                                  <td className="px-6 py-4">
-                                    <span className={`text-xs font-mono font-bold ${
-                                      order.remainingTime < 20 ? 'text-brand-red' : 
-                                      order.remainingTime < 60 ? 'text-brand-orange' : 'text-brand-green'
-                                    }`}>
-                                      {order.remainingTime}'
-                                    </span>
-                                  </td>
-                                  <td className="px-6 py-4 text-right">
-                                    <span className={`text-[9px] font-black px-2 py-1 rounded-full uppercase tracking-tighter ${getStatusColor(order.status)}`}>
-                                      {order.status}
-                                    </span>
-                                  </td>
-                                </motion.tr>
-                              ))}
-                            </motion.div>
+                                  </div>
+                                </td>
+                                <td className="px-6 py-4">
+                                  <span className="text-[10px] font-medium px-2 py-0.5 bg-slate-100 rounded-md text-slate-600 border border-slate-200">
+                                    {order.stage}
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4">
+                                  <span className={`text-xs font-mono font-bold ${
+                                    order.remainingTime < 20 ? 'text-brand-red' : 
+                                    order.remainingTime < 60 ? 'text-brand-orange' : 'text-brand-green'
+                                  }`}>
+                                    {order.remainingTime}'
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4 text-right">
+                                  <span className={`text-[9px] font-black px-2 py-1 rounded-full uppercase tracking-tighter ${getStatusColor(order.status)}`}>
+                                    {order.status}
+                                  </span>
+                                </td>
+                              </motion.tr>
+                            ))
                           ) : (
                             panelIdx === 0 && panelOrders.length === 0 && filteredOrders.length === 0 && (
                               <motion.tr
@@ -454,8 +452,8 @@ export default function App() {
                               </motion.tr>
                             )
                           )}
-                        </AnimatePresence>
-                      </tbody>
+                        </motion.tbody>
+                      </AnimatePresence>
                     </table>
                   </div>
                 </div>
