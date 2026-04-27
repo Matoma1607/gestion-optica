@@ -56,17 +56,17 @@ const LOCATIONS: Location[] = [
 const STAGES: Stage[] = ['Logística', 'Calibrado', 'Antireflejo', 'Superficie', 'Control Final', 'Armado'];
 
 const INITIAL_ORDERS: Order[] = [
-  { id: '#10056', location: '24 de Septiembre', promisedTime: '12:10', stage: 'Logística', remainingTime: 15, status: 'Vencida' },
-  { id: '#10112', location: '9 de Julio', promisedTime: '15:55', stage: 'Calibrado', remainingTime: 79, status: 'Vencida' },
-  { id: '#10166', location: 'Aguilares', promisedTime: '13:45', stage: 'Antireflejo', remainingTime: 16, status: 'Vencida' },
+  { id: '#10056', location: '24 de Septiembre', promisedTime: '12:10', stage: 'Logística', remainingTime: -5, status: 'Vencida' },
+  { id: '#10112', location: '9 de Julio', promisedTime: '15:55', stage: 'Calibrado', remainingTime: 79, status: 'A tiempo' },
+  { id: '#10166', location: 'Aguilares', promisedTime: '13:45', stage: 'Antireflejo', remainingTime: 45, status: 'En Riesgo' },
   { id: '#10385', location: 'Solmar Alem', promisedTime: '16:00', stage: 'Armado', remainingTime: 84, status: 'A tiempo' },
   { id: '#10281', location: 'Solmar Mendoza', promisedTime: '14:20', stage: 'Superficie', remainingTime: 34, status: 'En Riesgo' },
-  { id: '#10299', location: 'Junín', promisedTime: '12:30', stage: 'Control Final', remainingTime: 19, status: 'Vencida' },
+  { id: '#10299', location: 'Junín', promisedTime: '12:30', stage: 'Control Final', remainingTime: 0, status: 'Vencida' },
   { id: '#10197', location: 'Lutz Ferrando', promisedTime: '15:15', stage: 'Antireflejo', remainingTime: 57, status: 'En Riesgo' },
-  { id: '#10510', location: 'Maipú', promisedTime: '17:00', stage: 'Calibrado', remainingTime: 87, status: 'A tiempo' },
+  { id: '#10510', location: 'Maipú', promisedTime: '17:00', stage: 'Calibrado', remainingTime: 120, status: 'A tiempo' },
   { id: '#10017', location: 'Yerba Buena', promisedTime: '14:45', stage: 'Logística', remainingTime: 86, status: 'A tiempo' },
   { id: '#10104', location: 'Concepción', promisedTime: '15:52', stage: 'Armado', remainingTime: 52, status: 'En Riesgo' },
-  { id: '#10082', location: '24 de Septiembre', promisedTime: '14:23', stage: 'Control Final', remainingTime: 23, status: 'Vencida' },
+  { id: '#10082', location: '24 de Septiembre', promisedTime: '14:23', stage: 'Control Final', remainingTime: 15, status: 'En Riesgo' },
 ];
 
 const LOGISTICS_OUT: { id: string; destination: string; exitTime: string; items: string[] }[] = [
@@ -432,8 +432,8 @@ export default function App() {
                                 </td>
                                 <td className="px-6 py-4">
                                   <span className={`text-xs font-mono font-bold ${
-                                    order.remainingTime < 20 ? 'text-brand-red' : 
-                                    order.remainingTime < 60 ? 'text-brand-orange' : 'text-brand-green'
+                                    order.remainingTime <= 0 ? 'text-brand-red' : 
+                                    order.remainingTime <= 60 ? 'text-brand-orange' : 'text-brand-green'
                                   }`}>
                                     {order.remainingTime}'
                                   </span>
@@ -476,15 +476,15 @@ export default function App() {
             <div className="flex flex-wrap items-center justify-center gap-6">
               <div className="flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full bg-brand-red"></span>
-                <span>Vencida (&lt;30m)</span>
+                <span>Vencida (≤0m)</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full bg-brand-orange"></span>
-                <span>Alerta (30-60m)</span>
+                <span>Zona Crítica (≤60m)</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full bg-brand-green"></span>
-                <span>Óptimo (&gt;60m)</span>
+                <span>A Tiempo (&gt;60m)</span>
               </div>
             </div>
           </div>
