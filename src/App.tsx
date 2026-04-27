@@ -96,10 +96,7 @@ const RealTimeClock: React.FC = () => {
 
 const Header: React.FC = () => (
   <header className="flex flex-col md:flex-row justify-between items-center bg-brand-blue p-6 shadow-lg rounded-b-3xl">
-    <div className="flex items-center gap-4 mb-4 md:mb-0">
-      <div className="bg-white p-3 rounded-2xl shadow-inner">
-        <Activity className="text-brand-blue" size={32} />
-      </div>
+    <div className="flex flex-col items-center md:items-start mb-4 md:mb-0">
       <div>
         <h1 className="text-2xl font-bold text-white tracking-tight text-center md:text-left">Panel de Control de Laboratorio Óptico</h1>
         <p className="text-brand-green font-medium text-sm flex items-center justify-center md:justify-start gap-1 uppercase tracking-wider">
