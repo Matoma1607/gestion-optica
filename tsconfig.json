@@ -15,6 +15,9 @@
     "moduleDetection": "force",
     "allowJs": true,
     "jsx": "react-jsx",
+    "types": ["node", "react", "react-dom"],
+    "strict": true,
+    "esModuleInterop": true,
     "paths": {
       "@/*": [
         "./*"

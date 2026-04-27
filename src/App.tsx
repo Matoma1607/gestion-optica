@@ -1,30 +1,40 @@
-// @ts-nocheck
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Clock, 
   MapPin, 
   Truck, 
+  Settings, 
+  Zap, 
+  AlertTriangle, 
   CheckCircle2, 
+  TrendingUp, 
+  Filter,
+  ArrowRight,
+  ClipboardList,
+  Eye,
   Activity,
   Layers,
   Wrench,
-  Eye,
-  ClipboardList,
-  ArrowRight,
-  LucideIcon,
-  Search,
-  Package
+  LucideIcon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
-// --- Tipos & Datos ---
+// --- Tipos e Interfaces ---
 
 type Location = 
-  | '24 de Septiembre' | '9 de Julio' | 'Aguilares' | 'Solmar Alem' 
-  | 'Solmar Mendoza' | 'Junín' | 'Lutz Ferrando' | 'Maipú' 
-  | 'Yerba Buena' | 'Concepción';
+  | '24 de Septiembre' 
+  | '9 de Julio' 
+  | 'Aguilares' 
+  | 'Solmar Alem' 
+  | 'Solmar Mendoza' 
+  | 'Junín' 
+  | 'Lutz Ferrando' 
+  | 'Maipú' 
+  | 'Yerba Buena' 
+  | 'Concepción';
 
 type Stage = 'Logística' | 'Calibrado' | 'Antireflejo' | 'Superficie' | 'Control Final' | 'Armado';
+
 type Status = 'Vencida' | 'En Riesgo' | 'A tiempo';
 
 interface Order {
@@ -35,6 +45,8 @@ interface Order {
   remainingTime: number;
   status: Status;
 }
+
+// --- Constantes de Datos ---
 
 const STAGES: Stage[] = ['Logística', 'Calibrado', 'Antireflejo', 'Superficie', 'Control Final', 'Armado'];
 
@@ -61,38 +73,38 @@ const LOGISTICS_OUT = [
 
 // --- Sub-componentes ---
 
-const Header = () => {
-  const [time, setTime] = useState(new Date());
+const RealTimeClock: React.FC = () => {
+  const [time, setTime] = useState<Date>(new Date());
   useEffect(() => {
-    const t = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(t);
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
   }, []);
-
   return (
-    <header className="flex flex-col md:flex-row justify-between items-center bg-[#0f172a] p-6 shadow-2xl rounded-b-[2.5rem]">
-      <div className="flex items-center gap-4">
-        <div className="bg-brand-blue p-3 rounded-2xl shadow-lg shadow-brand-blue/20">
-          <Activity className="text-white" size={28} />
-        </div>
-        <div>
-          <h1 className="text-xl font-black text-white tracking-tight uppercase italic">Control Lab Óptico</h1>
-          <div className="flex items-center gap-2">
-            <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
-            <span className="text-brand-green text-[10px] font-bold uppercase tracking-widest">Sistema en línea</span>
-          </div>
-        </div>
-      </div>
-      <div className="mt-4 md:mt-0 flex items-center gap-3 bg-white/5 border border-white/10 px-6 py-2 rounded-2xl">
-        <Clock size={18} className="text-blue-400" />
-        <span className="text-xl font-mono font-bold text-white tracking-widest">
-          {time.toLocaleTimeString([], { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-        </span>
-      </div>
-    </header>
+    <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 shadow-sm">
+      <Clock size={16} className="text-white" />
+      <span className="font-mono font-bold text-white tracking-widest text-lg">
+        {time.toLocaleTimeString([], { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+      </span>
+    </div>
   );
 };
 
-interface StageProgressCardProps {
+const Header: React.FC = () => (
+  <header className="flex flex-col md:flex-row justify-between items-center bg-brand-blue p-6 shadow-lg rounded-b-3xl">
+    <div className="flex items-center gap-4">
+      <div className="bg-white p-3 rounded-2xl">
+        <Activity className="text-brand-blue" size={32} />
+      </div>
+      <div>
+        <h1 className="text-2xl font-black text-white tracking-tighter uppercase italic">Panel de Control Óptico</h1>
+        <p className="text-brand-green font-bold text-[10px] uppercase tracking-[0.2em]">Logística en Tiempo Real</p>
+      </div>
+    </div>
+    <RealTimeClock />
+  </header>
+);
+
+interface CardProps {
   stage: string;
   count: number;
   total: number;
@@ -102,178 +114,157 @@ interface StageProgressCardProps {
   onClick?: () => void;
 }
 
-function StageProgressCard({ stage, count, total, colorClass, icon: Icon, isSelected, onClick }: StageProgressCardProps) {
+const StageProgressCard: React.FC<CardProps> = ({ stage, count, total, colorClass, icon: Icon, isSelected, onClick }) => {
   const progress = (count / total) * 100;
   return (
     <motion.div 
-      whileHover={{ y: -5 }}
-      whileTap={{ scale: 0.95 }}
+      whileHover={{ y: -4, scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
       onClick={onClick}
-      className={`relative min-h-[160px] p-5 rounded-3xl cursor-pointer transition-all border-2 overflow-hidden flex flex-col justify-between ${
+      className={`p-6 rounded-[2rem] cursor-pointer transition-all border min-h-[140px] flex flex-col justify-between ${
         isSelected 
-          ? 'bg-[#1e3a8a] border-brand-blue shadow-2xl scale-105 z-10' 
-          : 'bg-white border-slate-100 shadow-sm hover:shadow-xl hover:border-blue-200'
+          ? 'bg-brand-blue border-transparent ring-4 ring-brand-blue/10 shadow-xl' 
+          : 'bg-white border-slate-100 shadow-sm hover:shadow-md'
       }`}
     >
-      <div className="flex justify-between items-start">
-        <div className={`p-3 rounded-2xl ${isSelected ? 'bg-white/10 text-white' : 'bg-slate-50 text-slate-400'}`}>
-          <Icon size={22} />
+      <div className="flex justify-between items-center">
+        <div className={`p-3 rounded-2xl ${isSelected ? 'bg-white/20 text-white' : `${colorClass.replace('bg-', 'bg-opacity-10 text-')}`}`}>
+          <Icon size={24} />
         </div>
         <div className="text-right">
           <span className={`text-3xl font-black ${isSelected ? 'text-white' : 'text-slate-800'}`}>{count}</span>
-          <p className={`text-[10px] font-bold uppercase tracking-widest ${isSelected ? 'text-blue-200' : 'text-slate-400'}`}>Tareas</p>
+          <p className={`text-[9px] font-black uppercase tracking-widest ${isSelected ? 'text-blue-200' : 'text-slate-400'}`}>Tareas</p>
         </div>
       </div>
-
-      <div className="mt-4">
-        <p className={`font-black text-xs uppercase tracking-tighter mb-2 ${isSelected ? 'text-white' : 'text-slate-700'}`}>
-          {stage}
-        </p>
-        <div className={`h-2.5 w-full rounded-full overflow-hidden ${isSelected ? 'bg-white/20' : 'bg-slate-100'}`}>
+      <div>
+        <p className={`text-[11px] font-black uppercase mb-2 ${isSelected ? 'text-blue-100' : 'text-slate-500'}`}>{stage}</p>
+        <div className={`w-full h-1.5 rounded-full overflow-hidden ${isSelected ? 'bg-white/10' : 'bg-slate-100'}`}>
           <motion.div 
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
-            className={`h-full rounded-full ${isSelected ? 'bg-green-400' : colorClass}`}
+            className={`h-full rounded-full ${isSelected ? 'bg-brand-green' : colorClass}`}
           />
         </div>
-        <div className={`flex justify-between mt-2 text-[10px] font-bold ${isSelected ? 'text-blue-200' : 'text-slate-400'}`}>
-          <span>AVANCE</span>
-          <span>{Math.round(progress)}%</span>
-        </div>
       </div>
-      
-      {isSelected && (
-        <div className="absolute top-2 right-2 flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-        </div>
-      )}
     </motion.div>
   );
-}
+};
 
-const LogisticsOutSection = () => (
-  <div className="bg-[#0f172a] text-white p-6 rounded-[2.5rem] shadow-2xl flex flex-col h-full border border-white/5">
-    <div className="flex items-center justify-between mb-8">
-      <h3 className="text-lg font-black italic uppercase tracking-tighter flex items-center gap-2">
-        <Truck className="text-brand-green" size={24} />
-        Logística Saliente
-      </h3>
-      <span className="bg-white/5 px-3 py-1 rounded-full text-[10px] font-bold text-slate-400 uppercase tracking-widest">Hoy</span>
-    </div>
-    
-    <div className="space-y-4 flex-1">
-      {LOGISTICS_OUT.map((job, idx) => (
-        <motion.div 
-          key={job.id}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: idx * 0.1 }}
-          className="group flex flex-col p-4 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all hover:border-brand-green/30"
-        >
-          <div className="flex justify-between items-center mb-1">
-            <span className="text-xs font-black text-brand-green uppercase tracking-widest">{job.id}</span>
-            <span className="text-[10px] font-mono text-slate-500">{job.exitTime}</span>
+const LogisticsOutSection: React.FC = () => (
+  <div className="bg-slate-900 text-white p-7 rounded-[2.5rem] shadow-2xl h-full border border-white/5 relative overflow-hidden flex flex-col">
+    <div className="absolute top-0 right-0 w-32 h-32 bg-brand-green/10 blur-3xl rounded-full -mr-10 -mt-10"></div>
+    <div className="relative z-10 flex flex-col h-full">
+      <div className="flex items-center justify-between mb-8">
+        <h3 className="text-xl font-black flex items-center gap-3 uppercase tracking-tighter italic">
+          <Truck size={24} className="text-brand-green" />
+          <span>LOGÍSTICA SALIENTE</span>
+        </h3>
+        <span className="bg-white/5 px-2 py-1 rounded text-[10px] font-bold text-slate-500 uppercase tracking-widest">Hoy</span>
+      </div>
+      
+      <div className="space-y-4 flex-1">
+        {LOGISTICS_OUT.map((job) => (
+          <div key={job.id} className="flex items-center justify-between bg-white/5 p-4 rounded-2xl border border-white/5 hover:bg-brand-green/10 transition-all cursor-default">
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-8 rounded-lg bg-brand-green text-slate-900 flex items-center justify-center font-black text-xs">
+                OK
+              </div>
+              <div>
+                <p className="text-[10px] text-slate-500 font-bold font-mono tracking-tighter">#{job.id.replace('#','')}</p>
+                <p className="text-xs font-black uppercase tracking-wider">{job.destination}</p>
+              </div>
+            </div>
+            <p className="text-xs font-mono text-brand-green font-bold">{job.exitTime}</p>
           </div>
-          <div className="flex items-center gap-2">
-            <MapPin size={12} className="text-slate-400" />
-            <span className="text-sm font-bold text-slate-100 uppercase tracking-tight">{job.destination}</span>
-          </div>
-        </motion.div>
-      ))}
-    </div>
+        ))}
+      </div>
 
-    <button className="mt-8 py-4 bg-brand-green/10 hover:bg-brand-green/20 text-brand-green rounded-2xl text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all group">
-      Ver todo <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-    </button>
+      <button className="mt-8 py-4 bg-brand-green/10 text-brand-green rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-brand-green text-center transition-all hover:text-slate-900 flex items-center justify-center gap-2">
+        Ver todo <ArrowRight size={14} />
+      </button>
+    </div>
   </div>
 );
+
+// --- Componente Principal ---
 
 export default function App() {
   const [filter, setFilter] = useState<'Todas' | 'Vencidas' | 'En Riesgo'>('Todas');
   const [selectedStage, setSelectedStage] = useState<Stage | null>(null);
-
+  
   const filteredOrders = useMemo(() => {
-    let res = INITIAL_ORDERS;
-    if (filter !== 'Todas') res = res.filter(o => o.status === filter);
-    if (selectedStage) res = res.filter(o => o.stage === selectedStage);
-    return res;
+    let result = INITIAL_ORDERS;
+    if (filter !== 'Todas') result = result.filter(o => o.status === filter);
+    if (selectedStage) result = result.filter(o => o.stage === selectedStage);
+    return result;
   }, [filter, selectedStage]);
 
   const stats = useMemo(() => {
-    return STAGES.map(s => ({
-      stage: s,
-      count: INITIAL_ORDERS.filter(o => o.stage === s).length,
+    return STAGES.map(stage => ({
+      stage,
+      count: INITIAL_ORDERS.filter(o => o.stage === stage).length,
       total: INITIAL_ORDERS.length
     }));
   }, []);
 
-  const getStageIcon = (s: Stage) => {
-    const icons = { Logística: Truck, Calibrado: Wrench, Antireflejo: Eye, Superficie: Layers, 'Control Final': CheckCircle2, Armado: ClipboardList };
-    return icons[s];
+  const getStageIcon = (stage: Stage): LucideIcon => {
+    const icons: Record<Stage, LucideIcon> = {
+      'Logística': Truck, 'Calibrado': Wrench, 'Antireflejo': Eye,
+      'Superficie': Layers, 'Control Final': CheckCircle2, 'Armado': ClipboardList
+    };
+    return icons[stage];
   };
 
-  const getStageColor = (idx: number) => {
-    const colors = ['bg-blue-500', 'bg-indigo-500', 'bg-purple-500', 'bg-pink-500', 'bg-emerald-500', 'bg-amber-500'];
-    return colors[idx % colors.length];
+  const getStatusColor = (status: Status) => {
+    const colors = {
+      'Vencida': 'bg-brand-red text-white',
+      'En Riesgo': 'bg-brand-orange text-white',
+      'A tiempo': 'bg-brand-green text-white'
+    };
+    return colors[status];
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] pb-20">
+    <div className="min-h-screen pb-12 flex flex-col bg-slate-50 font-sans">
       <Header />
       
-      <main className="max-w-[1600px] mx-auto px-6 mt-10">
+      <main className="flex-1 max-w-[1600px] mx-auto w-full px-6 mt-8 space-y-8">
         
-        {/* Superior: Tarjetas y Logística divididos */}
-        <div className="flex flex-col lg:flex-row gap-8 items-start mb-12">
-          {/* Grid de Tarjetas (6 columnas en desktop) */}
-          <div className="lg:w-3/4 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-5 w-full">
-            {stats.map((stat, idx) => (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+            {stats.map((s, i) => (
               <StageProgressCard 
-                key={stat.stage}
-                {...stat}
-                icon={getStageIcon(stat.stage as Stage)}
-                colorClass={getStageColor(idx)}
-                isSelected={selectedStage === stat.stage}
-                onClick={() => setSelectedStage(selectedStage === stat.stage ? null : stat.stage as Stage)}
+                key={s.stage}
+                stage={s.stage}
+                count={s.count}
+                total={s.total}
+                isSelected={selectedStage === s.stage}
+                onClick={() => setSelectedStage(selectedStage === s.stage ? null : s.stage as Stage)}
+                icon={getStageIcon(s.stage as Stage)}
+                colorClass={['bg-blue-500', 'bg-indigo-500', 'bg-purple-500', 'bg-pink-500', 'bg-brand-green', 'bg-brand-orange'][i]}
               />
             ))}
           </div>
-          
-          {/* Panel Lateral de Logística */}
-          <div className="lg:w-1/4 w-full h-full lg:min-h-[400px]">
+          <div className="lg:col-span-4 h-full min-h-[400px]">
             <LogisticsOutSection />
           </div>
         </div>
 
-        {/* Tabla Principal */}
-        <section className="bg-white rounded-[3rem] shadow-xl border border-slate-200/60 overflow-hidden">
-          <div className="p-10 flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="flex items-center gap-4">
-              <div className="h-14 w-14 rounded-3xl bg-blue-50 flex items-center justify-center text-brand-blue">
-                <Package size={28} />
-              </div>
-              <div>
-                <h2 className="text-2xl font-black text-slate-800 tracking-tighter uppercase italic">Monitoreo Crítico</h2>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Resumen de Órdenes</span>
-                  {selectedStage && (
-                    <span className="bg-blue-600 text-white px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-tighter">Filtro: {selectedStage}</span>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex gap-2 bg-slate-100 p-1.5 rounded-[2rem]">
-              {(['Todas', 'Vencidas', 'En Riesgo'] as const).map(f => (
+        <section className="bg-white rounded-[3rem] shadow-2xl border border-slate-100 overflow-hidden">
+          <div className="p-8 border-b border-slate-50 flex flex-col md:flex-row justify-between items-center gap-6">
+            <h2 className="text-xl font-black text-slate-800 uppercase tracking-tighter italic flex items-center gap-3">
+              <ClipboardList className="text-brand-blue" />
+              Resumen de Órdenes Críticas
+              {selectedStage && <span className="ml-4 bg-brand-blue text-white text-[9px] px-2 py-1 rounded tracking-widest">{selectedStage}</span>}
+            </h2>
+            <div className="flex bg-slate-100 p-1.5 rounded-2xl">
+              {(['Todas', 'Vencidas', 'En Riesgo'] as const).map((f) => (
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
-                  className={`px-8 py-3 rounded-full text-xs font-black uppercase tracking-widest transition-all ${
-                    filter === f ? 'bg-white text-slate-900 shadow-xl scale-105' : 'text-slate-400 hover:text-slate-600'
-                  }`}
+                  className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all ${filter === f ? 'bg-white text-brand-blue shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}
                 >
-                  {f}
+                  {f.toUpperCase()}
                 </button>
               ))}
             </div>
@@ -283,50 +274,25 @@ export default function App() {
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-slate-50/50">
-                  <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic">Orden</th>
-                  <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic">Sede Local</th>
-                  <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic font-mono">Prometida</th>
-                  <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic">Fase Actual</th>
-                  <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic text-center">Tiempo</th>
-                  <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">Estado</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Orden</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Local</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Promesa</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Etapa</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Restante</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Estado</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-50">
                 <AnimatePresence mode="popLayout">
-                  {filteredOrders.map((o, idx) => (
-                    <motion.tr 
-                      key={o.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: idx * 0.05 }}
-                      className="hover:bg-blue-50/20 transition-all group"
-                    >
-                      <td className="px-10 py-6 font-black text-brand-blue font-mono">{o.id}</td>
-                      <td className="px-10 py-6">
-                        <div className="flex flex-col">
-                          <span className="text-sm font-black text-slate-700 uppercase tracking-tighter">{o.location}</span>
-                          <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1 uppercase tracking-widest"><MapPin size={8}/> Tucumán</span>
-                        </div>
-                      </td>
-                      <td className="px-10 py-6 font-mono text-sm font-bold text-slate-500">{o.promisedTime}</td>
-                      <td className="px-10 py-6">
-                        <span className="text-[10px] font-black px-4 py-1.5 rounded-xl bg-slate-100 text-slate-500 border border-slate-200/60 uppercase tracking-widest">
-                          {o.stage}
-                        </span>
-                      </td>
-                      <td className="px-10 py-6 text-center">
-                        <span className={`text-sm font-mono font-black ${
-                          o.remainingTime < 25 ? 'text-red-500 animate-pulse' : 'text-slate-800'
-                        }`}>
-                          {o.remainingTime}min
-                        </span>
-                      </td>
-                      <td className="px-10 py-6 text-right">
-                        <span className={`text-[9px] font-black px-4 py-2 rounded-full uppercase tracking-widest ${
-                          o.status === 'Vencida' ? 'bg-red-500 text-white shadow-lg shadow-red-500/20' :
-                          o.status === 'En Riesgo' ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20' :
-                          'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
-                        }`}>
+                  {filteredOrders.map((o) => (
+                    <motion.tr key={o.id} layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="hover:bg-slate-50 transition-colors">
+                      <td className="px-8 py-5 font-mono text-sm font-bold text-brand-blue">{o.id}</td>
+                      <td className="px-8 py-5 font-black text-xs text-slate-700 uppercase tracking-wider">{o.location}</td>
+                      <td className="px-8 py-5 font-mono text-xs text-slate-500 italic">{o.promisedTime}</td>
+                      <td className="px-8 py-5"><span className="px-2 py-1 bg-slate-100 rounded text-[10px] font-bold text-slate-500 uppercase">{o.stage}</span></td>
+                      <td className="px-8 py-5 font-mono font-black text-brand-red text-sm">{o.remainingTime} min</td>
+                      <td className="px-8 py-5">
+                        <span className={`text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-tighter ${getStatusColor(o.status)}`}>
                           {o.status}
                         </span>
                       </td>
@@ -338,9 +304,9 @@ export default function App() {
           </div>
         </section>
       </main>
-      
-      <footer className="mt-20 text-center text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em]">
-        Panel de Control v1.0.2-Beta © 2026 LogisticLab
+
+      <footer className="mt-8 text-center text-[10px] font-bold text-slate-300 uppercase tracking-widest">
+        Sistema Control Óptico Beta v1.0
       </footer>
     </div>
   );
