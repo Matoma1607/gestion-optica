@@ -207,7 +207,7 @@ const LogisticsOutSection: React.FC<{ onOpenHistory: () => void }> = ({ onOpenHi
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center gap-4">
                 <div className="h-10 w-10 rounded-2xl bg-brand-green/20 flex items-center justify-center text-brand-green group-hover:scale-110 transition-transform">
-                  <CheckCircle2 size={18} />
+                  <Truck size={18} />
                 </div>
                 <div className="flex flex-col">
                   <span className="text-[10px] text-slate-500 font-mono tracking-widest uppercase font-black">ORDEN</span>
@@ -216,7 +216,10 @@ const LogisticsOutSection: React.FC<{ onOpenHistory: () => void }> = ({ onOpenHi
               </div>
               
               <div className="text-right flex flex-col">
-                <span className="text-[10px] text-brand-green font-black uppercase tracking-widest px-2 py-0.5 bg-brand-green/10 rounded-md border border-brand-green/20">{job.destination}</span>
+                <div className="flex flex-col items-end">
+                  <span className="text-[8px] text-slate-500 font-black uppercase tracking-widest mb-0.5">Sucursal</span>
+                  <span className="text-[10px] text-brand-green font-black uppercase tracking-widest px-2 py-0.5 bg-brand-green/10 rounded-md border border-brand-green/20">{job.destination}</span>
+                </div>
                 <span className="text-[10px] font-mono text-slate-400 mt-1 font-bold">{job.exitTime.replace(' p. m.', ' PM').replace(' a. m.', ' AM')}</span>
               </div>
             </div>
@@ -537,14 +540,15 @@ export default function App() {
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-4">
                         <div className="h-12 w-12 rounded-2xl bg-brand-blue/5 flex items-center justify-center text-brand-blue group-hover:scale-105 transition-transform">
-                          <CheckCircle2 size={24} className="text-brand-green" />
+                          <Truck size={24} className="text-brand-green" />
                         </div>
                         <div>
-                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Orden</p>
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Orden de Salida</p>
                           <p className="text-xl font-black text-brand-blue tracking-tight">{job.id.replace('#', '')}</p>
                         </div>
                       </div>
                       <div className="text-right">
+                        <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Sucursal Destino</p>
                         <span className="text-[10px] bg-brand-blue text-white px-3 py-1 rounded-full font-black uppercase tracking-tighter shadow-sm border border-brand-blue/10">
                           {job.destination}
                         </span>
