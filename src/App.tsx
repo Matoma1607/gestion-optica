@@ -70,10 +70,10 @@ const INITIAL_ORDERS: Order[] = [
 ];
 
 const LOGISTICS_OUT: { id: string; destination: string; exitTime: string; items: string[] }[] = [
-  { id: '#10056', destination: 'Centro', exitTime: '12:10 p. m.', items: ['Multifocal Blue Cut', 'Armazón Acetato'] },
-  { id: '#10112', destination: 'Norte', exitTime: '03:55 p. m.', items: ['Orgánico Blanco', 'Reparación Patilla'] },
-  { id: '#10166', destination: 'Centro', exitTime: '03:55 p. m.', items: ['Policarbonato AR', 'Estuche Rígido'] },
-  { id: '#10385', destination: 'Centro', exitTime: '04:00 p. m.', items: ['Lente de Contacto', 'Líquido Limpieza'] },
+  { id: '#10056', destination: '24 de Septiembre', exitTime: '12:10 p. m.', items: ['Multifocal Blue Cut', 'Armazón Acetato'] },
+  { id: '#10112', destination: 'Yerba Buena', exitTime: '03:55 p. m.', items: ['Orgánico Blanco', 'Reparación Patilla'] },
+  { id: '#10166', destination: 'Aguilares', exitTime: '03:55 p. m.', items: ['Policarbonato AR', 'Estuche Rígido'] },
+  { id: '#10385', destination: 'Solmar Alem', exitTime: '04:00 p. m.', items: ['Lente de Contacto', 'Líquido Limpieza'] },
 ];
 
 // --- Sub-components ---
