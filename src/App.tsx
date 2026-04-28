@@ -374,90 +374,83 @@ const MonitorView: React.FC<{
         </div>
       </header>
 
-      {/* Tabla del Monitor */}
-      <main className="flex-1 p-8 md:p-12 overflow-auto">
-        <div className="max-w-[1600px] mx-auto">
-          <div className="bg-white rounded-[3.5rem] shadow-[0_35px_60px_-15px_rgba(0,0,0,0.3)] overflow-hidden border border-white/10">
-            <table className="w-full text-left border-collapse table-fixed lg:table-auto">
-              <thead>
-                <tr className="bg-slate-50">
-                  <th className="px-10 py-8 text-[13px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic w-1/6">Orden</th>
-                  <th className="px-10 py-8 text-[13px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic w-1/4">Sucursal / Local</th>
-                  <th className="px-10 py-8 text-[13px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic w-1/4">Etapa Actual</th>
-                  <th className="px-10 py-8 text-[13px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic text-center w-1/6">T. Restante</th>
-                  <th className="px-10 py-8 text-[13px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic text-right w-1/6">Estado</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                <AnimatePresence>
-                  {filteredOrders.map((order, idx) => (
-                    <motion.tr 
-                      key={order.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: idx * 0.05 }}
-                      className="hover:bg-slate-50/80 transition-colors group"
-                    >
-                      <td className="px-10 py-8">
-                        <span className="text-3xl font-black text-brand-blue tracking-tighter font-mono">#{order.id.replace('#', '')}</span>
-                      </td>
-                      <td className="px-10 py-8">
-                        <div className="flex flex-col">
-                          <span className="font-black text-slate-800 text-2xl tracking-tight">{order.location}</span>
-                          <span className="text-xs text-slate-400 font-bold flex items-center gap-2 mt-1 uppercase tracking-widest">
-                            <Clock size={14} className="text-brand-blue" /> Prometido a las {order.promisedTime}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-10 py-8">
-                        <div className="flex items-center gap-3">
-                          <div className="h-2 w-2 rounded-full bg-brand-blue shadow-glow animate-pulse"></div>
-                          <span className="bg-brand-blue/5 text-brand-blue px-5 py-2 rounded-2xl text-xs font-black uppercase tracking-widest border border-brand-blue/10">
-                            {order.stage}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-10 py-8 text-center">
-                        <span className={`text-4xl font-black ${
-                          order.remainingTime <= 0 ? 'text-brand-red animate-pulse' : 
-                          order.remainingTime <= 60 ? 'text-brand-orange' : 'text-brand-green'
-                        }`}>
-                          {order.remainingTime} <span className="text-sm uppercase -ml-1">min</span>
-                        </span>
-                      </td>
-                      <td className="px-10 py-8 text-right">
-                        <span className={`text-xs font-black px-6 py-2.5 rounded-full uppercase tracking-[0.2em] shadow-lg inline-block transform group-hover:scale-105 transition-transform ${getStatusColor(order.status)}`}>
-                          {order.status}
-                        </span>
-                      </td>
-                    </motion.tr>
-                  ))}
-                </AnimatePresence>
-                {filteredOrders.length === 0 && (
-                  <tr>
-                    <td colSpan={5} className="py-40 text-center">
-                      <motion.div 
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 0.3, scale: 1 }}
-                        className="flex flex-col items-center gap-6"
-                      >
-                        <ClipboardList size={80} />
-                        <p className="text-2xl font-black uppercase tracking-[0.3em]">Sin órdenes pendientes</p>
-                      </motion.div>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+      {/* Tablas del Monitor Divididas */}
+      <main className="flex-1 p-6 md:p-8 overflow-auto">
+        <div className="max-w-[1900px] mx-auto">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            {[0, 1].map((panelIdx) => {
+              const panelOrders = filteredOrders.filter((_, i) => i % 2 === panelIdx);
+              return (
+                <div key={panelIdx} className="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/10">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-slate-50">
+                        <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic w-24">Orden</th>
+                        <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic">Sucursal</th>
+                        <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic text-center">T. Rest</th>
+                        <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic text-right">Estado</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50">
+                      <AnimatePresence mode="popLayout">
+                        {panelOrders.map((order, idx) => (
+                          <motion.tr 
+                            key={order.id}
+                            layout
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ duration: 0.2, delay: idx * 0.03 }}
+                            className="hover:bg-slate-50 transition-colors group"
+                          >
+                            <td className="px-6 py-6">
+                              <span className="text-xl font-black text-brand-blue tracking-tighter font-mono">#{order.id.replace('#', '')}</span>
+                            </td>
+                            <td className="px-6 py-6">
+                              <div className="flex flex-col min-w-0">
+                                <span className="font-black text-slate-800 text-base tracking-tight truncate">{order.location}</span>
+                                <span className="text-[10px] text-brand-blue font-bold uppercase tracking-tight truncate opacity-70">
+                                  {order.stage}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="px-6 py-6 text-center">
+                              <span className={`text-2xl font-black ${
+                                order.remainingTime <= 0 ? 'text-brand-red animate-pulse' : 
+                                order.remainingTime <= 60 ? 'text-brand-orange' : 'text-brand-green'
+                              }`}>
+                                {order.remainingTime}'
+                              </span>
+                            </td>
+                            <td className="px-6 py-6 text-right">
+                              <span className={`text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest shadow-md inline-block ${getStatusColor(order.status)}`}>
+                                {order.status}
+                              </span>
+                            </td>
+                          </motion.tr>
+                        ))}
+                      </AnimatePresence>
+                      {panelOrders.length === 0 && panelIdx === 0 && (
+                        <tr>
+                          <td colSpan={4} className="py-20 text-center text-slate-300 font-bold uppercase tracking-widest">
+                            No hay órdenes pendientes
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              );
+            })}
           </div>
           
           {selectedStage && (
-            <div className="mt-12 flex justify-center">
+            <div className="mt-8 flex justify-center">
               <button 
                 onClick={() => setSelectedStage(null)}
-                className="bg-brand-blue/10 text-brand-blue border border-brand-blue/20 px-10 py-5 rounded-3xl font-black uppercase tracking-widest text-sm hover:bg-brand-blue hover:text-white transition-all shadow-xl flex items-center gap-4 group"
+                className="bg-brand-blue text-white px-10 py-4 rounded-3xl font-black uppercase tracking-widest text-xs hover:bg-brand-blue/90 transition-all shadow-xl flex items-center gap-4"
               >
-                Limpiar Filtro de Etapa: {selectedStage} <X size={20} className="group-hover:rotate-90 transition-transform" />
+                Limpiar Filtro: {selectedStage} <X size={20} />
               </button>
             </div>
           )}
