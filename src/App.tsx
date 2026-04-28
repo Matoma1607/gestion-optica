@@ -392,57 +392,60 @@ export default function App() {
 
         {/* Bottom Section: Main Table Split in Two Panels */}
         <section className="space-y-6">
-          <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <div>
-              <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                <ClipboardList className="text-brand-blue" />
-                Resumen Detallado de Órdenes Críticas
+          <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-5 md:p-8 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 overflow-hidden">
+            <div className="flex-1 min-w-0">
+              <h2 className="text-lg md:text-xl font-bold text-slate-800 flex items-center gap-2 flex-wrap">
+                <ClipboardList className="text-brand-blue shrink-0" />
+                <span className="truncate">Resumen Detallado de Órdenes Críticas</span>
               </h2>
-              <div className="flex items-center gap-2 mt-1">
-                <p className="text-slate-500 text-sm">Lista en tiempo real dividida para mayor visibilidad</p>
+              <div className="flex flex-wrap items-center gap-2 mt-1">
+                <p className="text-slate-500 text-xs md:text-sm">Lista en tiempo real dividida para mayor visibilidad</p>
                 {selectedStage && (
                   <motion.span 
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="bg-brand-blue/10 text-brand-blue px-2 py-0.5 rounded-md text-[10px] font-bold uppercase"
+                    className="bg-brand-blue/10 text-brand-blue px-2 py-0.5 rounded-md text-[9px] font-bold uppercase shrink-0"
                   >
-                    Filtrando por: {selectedStage}
+                    Etapa: {selectedStage}
                   </motion.span>
                 )}
               </div>
             </div>
             
-            <div className="flex bg-slate-100 p-1 rounded-2xl overflow-x-auto">
-              {(['Todas', 'Vencidas', 'En Riesgo'] as const).map((f: 'Todas' | 'Vencidas' | 'En Riesgo') => (
-                <SmartTooltip 
-                  key={f} 
-                  text={
-                    f === 'Todas' ? 'Ver todo el listado' : 
-                    f === 'Vencidas' ? 'Pedidos fuera de tiempo (≤0m)' : 
-                    'Zona crítica (Tolerancia ≤60m)'
-                  }
-                >
-                  <button
-                    onClick={() => setFilter(f)}
-                    className={`px-5 py-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap flex items-center gap-2 ${
-                      filter === f 
-                        ? 'bg-white text-slate-900 shadow-md transform scale-105' 
-                        : 'text-slate-500 hover:text-slate-700'
-                    }`}
+            <div className="w-full xl:w-auto">
+              <div className="flex bg-slate-100 p-1 rounded-2xl overflow-x-auto scrollbar-hide max-w-full">
+                {(['Todas', 'Vencidas', 'En Riesgo'] as const).map((f: 'Todas' | 'Vencidas' | 'En Riesgo') => (
+                  <SmartTooltip 
+                    key={f} 
+                    text={
+                      f === 'Todas' ? 'Ver todo el listado' : 
+                      f === 'Vencidas' ? 'Vencidas (≤0m)' : 
+                      'En Riesgo (≤60m)'
+                    }
+                    className="flex-1 xl:flex-none"
                   >
-                    <span>{f}</span>
-                    {filterCounts[f] > 0 && (
-                      <span className={`flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-black ${
-                        f === 'Vencidas' ? 'bg-brand-red text-white' : 
-                        f === 'En Riesgo' ? 'bg-brand-orange text-white' : 
-                        'bg-slate-200 text-slate-600'
-                      }`}>
-                        {filterCounts[f]}
-                      </span>
-                    )}
-                  </button>
-                </SmartTooltip>
-              ))}
+                    <button
+                      onClick={() => setFilter(f)}
+                      className={`w-full px-4 md:px-5 py-2 rounded-xl text-xs md:text-sm font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2 ${
+                        filter === f 
+                          ? 'bg-white text-slate-900 shadow-md transform scale-105' 
+                          : 'text-slate-500 hover:text-slate-700'
+                      }`}
+                    >
+                      <span>{f}</span>
+                      {filterCounts[f] > 0 && (
+                        <span className={`flex items-center justify-center min-w-[18px] h-4.5 px-1 rounded-full text-[9px] font-black ${
+                          f === 'Vencidas' ? 'bg-brand-red text-white' : 
+                          f === 'En Riesgo' ? 'bg-brand-orange text-white' : 
+                          'bg-slate-200 text-slate-600'
+                        }`}>
+                          {filterCounts[f]}
+                        </span>
+                      )}
+                    </button>
+                  </SmartTooltip>
+                ))}
+              </div>
             </div>
           </div>
 
