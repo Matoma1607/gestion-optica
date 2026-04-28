@@ -35,7 +35,22 @@ type Location =
   | 'Yerba Buena' 
   | 'Concepción';
 
-type Stage = 'Logística' | 'Calibrado' | 'Antireflejo' | 'Superficie' | 'Control Final' | 'Armado';
+type Stage = 
+  | 'General'
+  | 'Calibrado' 
+  | 'Cristales' 
+  | 'Logística' 
+  | 'Opticenter' 
+  | 'Lutz Ferrand' 
+  | 'Casa Central' 
+  | 'Yerba Buena' 
+  | 'Solmar 2' 
+  | 'Concepción' 
+  | 'Moto 1' 
+  | 'Moto 2' 
+  | 'Armazones' 
+  | 'Superficie' 
+  | 'Antireflejo';
 
 type Status = 'Vencida' | 'En Riesgo' | 'A tiempo';
 
@@ -53,20 +68,41 @@ const LOCATIONS: Location[] = [
   'Junín', 'Lutz Ferrando', 'Maipú', 'Yerba Buena', 'Concepción'
 ];
 
-const STAGES: Stage[] = ['Logística', 'Calibrado', 'Antireflejo', 'Superficie', 'Control Final', 'Armado'];
+const STAGES: Stage[] = [
+  'General',
+  'Calibrado',
+  'Cristales',
+  'Logística',
+  'Opticenter',
+  'Lutz Ferrand',
+  'Casa Central',
+  'Yerba Buena',
+  'Solmar 2',
+  'Concepción',
+  'Moto 1',
+  'Moto 2',
+  'Armazones',
+  'Superficie',
+  'Antireflejo'
+];
 
 const INITIAL_ORDERS: Order[] = [
   { id: '#10056', location: '24 de Septiembre', promisedTime: '12:10', stage: 'Logística', remainingTime: -5, status: 'Vencida' },
   { id: '#10112', location: '9 de Julio', promisedTime: '15:55', stage: 'Calibrado', remainingTime: 79, status: 'A tiempo' },
   { id: '#10166', location: 'Aguilares', promisedTime: '13:45', stage: 'Antireflejo', remainingTime: 45, status: 'En Riesgo' },
-  { id: '#10385', location: 'Solmar Alem', promisedTime: '16:00', stage: 'Armado', remainingTime: 84, status: 'A tiempo' },
+  { id: '#10385', location: 'Solmar Alem', promisedTime: '16:00', stage: 'Yerba Buena', remainingTime: 84, status: 'A tiempo' },
   { id: '#10281', location: 'Solmar Mendoza', promisedTime: '14:20', stage: 'Superficie', remainingTime: 34, status: 'En Riesgo' },
-  { id: '#10299', location: 'Junín', promisedTime: '12:30', stage: 'Control Final', remainingTime: 0, status: 'Vencida' },
+  { id: '#10299', location: 'Junín', promisedTime: '12:30', stage: 'Cristales', remainingTime: 0, status: 'Vencida' },
   { id: '#10197', location: 'Lutz Ferrando', promisedTime: '15:15', stage: 'Antireflejo', remainingTime: 57, status: 'En Riesgo' },
   { id: '#10510', location: 'Maipú', promisedTime: '17:00', stage: 'Calibrado', remainingTime: 120, status: 'A tiempo' },
-  { id: '#10017', location: 'Yerba Buena', promisedTime: '14:45', stage: 'Logística', remainingTime: 86, status: 'A tiempo' },
-  { id: '#10104', location: 'Concepción', promisedTime: '15:52', stage: 'Armado', remainingTime: 52, status: 'En Riesgo' },
-  { id: '#10082', location: '24 de Septiembre', promisedTime: '14:23', stage: 'Control Final', remainingTime: 15, status: 'En Riesgo' },
+  { id: '#10017', location: 'Yerba Buena', promisedTime: '14:45', stage: 'Casa Central', remainingTime: 86, status: 'A tiempo' },
+  { id: '#10104', location: 'Concepción', promisedTime: '15:52', stage: 'Concepción', remainingTime: 52, status: 'En Riesgo' },
+  { id: '#10082', location: '24 de Septiembre', promisedTime: '14:23', stage: 'Moto 1', remainingTime: 15, status: 'En Riesgo' },
+  { id: '#10621', location: '9 de Julio', promisedTime: '18:10', stage: 'Moto 2', remainingTime: 145, status: 'A tiempo' },
+  { id: '#10744', location: 'Aguilares', promisedTime: '19:30', stage: 'Armazones', remainingTime: 230, status: 'A tiempo' },
+  { id: '#10812', location: 'Solmar Alem', promisedTime: '11:15', stage: 'Opticenter', remainingTime: -120, status: 'Vencida' },
+  { id: '#10915', location: 'Yerba Buena', promisedTime: '16:45', stage: 'Solmar 2', remainingTime: 35, status: 'En Riesgo' },
+  { id: '#10999', location: 'Lutz Ferrando', promisedTime: '15:20', stage: 'Lutz Ferrand', remainingTime: 25, status: 'En Riesgo' },
 ];
 
 const LOGISTICS_OUT: { id: string; destination: string; exitTime: string; items: string[] }[] = [
@@ -316,11 +352,20 @@ export default function App() {
   }, [orders, filter, selectedStage]);
 
   const stats = useMemo(() => {
-    return STAGES.map(stage => ({
-      stage,
-      count: orders.filter(o => o.stage === stage).length,
-      total: orders.length
-    }));
+    return STAGES.map(stage => {
+      if (stage === 'General') {
+        return {
+          stage,
+          count: orders.length,
+          total: orders.length
+        };
+      }
+      return {
+        stage,
+        count: orders.filter(o => o.stage === stage).length,
+        total: orders.length
+      };
+    });
   }, [orders]);
 
   const filterCounts = useMemo(() => ({
@@ -339,12 +384,24 @@ export default function App() {
 
   const getStageIcon = (stage: Stage) => {
     switch (stage) {
+      case 'General': return Activity;
       case 'Logística': return Truck;
       case 'Calibrado': return Wrench;
-      case 'Antireflejo': return Eye;
+      case 'Cristales': return Eye;
+      case 'Antireflejo': return Zap;
       case 'Superficie': return Layers;
-      case 'Control Final': return CheckCircle2;
-      case 'Armado': return ClipboardList;
+      case 'Opticenter':
+      case 'Lutz Ferrand':
+      case 'Casa Central':
+      case 'Yerba Buena':
+      case 'Solmar 2':
+      case 'Concepción':
+        return MapPin;
+      case 'Moto 1':
+      case 'Moto 2':
+        return Truck;
+      case 'Armazones': return ClipboardList;
+      default: return ClipboardList;
     }
   };
 
@@ -369,15 +426,22 @@ export default function App() {
                   stage={stat.stage} 
                   count={stat.count} 
                   total={stat.total}
-                  isSelected={selectedStage === stat.stage}
-                  onClick={() => setSelectedStage(selectedStage === stat.stage ? null : stat.stage as Stage)}
+                  isSelected={selectedStage === stat.stage || (stat.stage === 'General' && !selectedStage)}
+                  onClick={() => {
+                    if (stat.stage === 'General') {
+                      setSelectedStage(null);
+                    } else {
+                      setSelectedStage(selectedStage === stat.stage ? null : stat.stage as Stage);
+                    }
+                  }}
                   icon={getStageIcon(stat.stage as Stage)}
                   colorClass={
-                    idx === 0 ? 'bg-blue-500' : 
-                    idx === 1 ? 'bg-indigo-500' : 
-                    idx === 2 ? 'bg-purple-500' : 
-                    idx === 3 ? 'bg-pink-500' : 
-                    idx === 4 ? 'bg-brand-green' : 'bg-brand-orange'
+                    stat.stage === 'General' ? 'bg-brand-blue' :
+                    idx % 6 === 0 ? 'bg-blue-500' : 
+                    idx % 6 === 1 ? 'bg-indigo-500' : 
+                    idx % 6 === 2 ? 'bg-purple-500' : 
+                    idx % 6 === 3 ? 'bg-pink-500' : 
+                    idx % 6 === 4 ? 'bg-brand-green' : 'bg-brand-orange'
                   }
                 />
               </SmartTooltip>
