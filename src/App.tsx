@@ -285,21 +285,21 @@ const LogisticsOutSection: React.FC<{ onOpenHistory: () => void }> = ({ onOpenHi
               transition={{ delay: idx * 0.1 }}
               className="group flex flex-col bg-white/5 p-4 rounded-3xl border border-white/10 hover:bg-white/10 transition-all hover:border-brand-green/30 cursor-default gap-3"
             >
-              <div className="flex items-center justify-between w-full">
-                <div className="flex items-center gap-4">
-                  <div className="h-10 w-10 rounded-2xl bg-brand-green/20 flex items-center justify-center text-brand-green group-hover:scale-110 transition-transform">
+              <div className="flex items-center justify-between w-full gap-2">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="h-10 w-10 shrink-0 rounded-2xl bg-brand-green/20 flex items-center justify-center text-brand-green group-hover:scale-110 transition-transform">
                     <Truck size={18} />
                   </div>
-                  <div className="flex flex-col">
-                    <span className="text-[10px] text-slate-500 font-mono tracking-widest uppercase font-black">ORDEN</span>
-                    <span className="text-lg font-black text-brand-green tracking-tight">{job.id.replace('#', '')}</span>
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-[10px] text-slate-500 font-mono tracking-widest uppercase font-black truncate">ORDEN</span>
+                    <span className="text-lg font-black text-brand-green tracking-tight truncate">{job.id.replace('#', '')}</span>
                   </div>
                 </div>
                 
-                <div className="text-right flex flex-col">
+                <div className="text-right flex flex-col shrink-0">
                   <div className="flex flex-col items-end">
-                    <span className="text-[8px] text-slate-500 font-black uppercase tracking-widest mb-0.5">Sucursal</span>
-                    <span className="text-[10px] text-brand-green font-black uppercase tracking-widest px-2 py-0.5 bg-brand-green/10 rounded-md border border-brand-green/20">{job.destination}</span>
+                    <span className="text-[8px] text-slate-500 font-black uppercase tracking-widest mb-0.5 whitespace-nowrap">Sucursal</span>
+                    <span className="text-[10px] text-brand-green font-black uppercase tracking-widest px-2 py-0.5 bg-brand-green/10 rounded-md border border-brand-green/20 whitespace-nowrap">{job.destination}</span>
                   </div>
                 </div>
               </div>
@@ -637,23 +637,23 @@ export default function App() {
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               className="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
             >
-              <div className="p-8 bg-brand-blue text-white flex justify-between items-center relative overflow-hidden">
+              <div className="p-5 md:p-8 bg-brand-blue text-white flex justify-between items-center relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-brand-green/10 blur-3xl rounded-full -mr-10 -mt-10"></div>
-                <div className="relative z-10">
-                  <h2 className="text-2xl font-black tracking-tight flex items-center gap-3 italic">
-                    <History className="text-brand-green" /> HISTORIAL DE SALIDAS
+                <div className="relative z-10 min-w-0">
+                  <h2 className="text-xl md:text-2xl font-black tracking-tight flex items-center gap-3 italic">
+                    <History className="text-brand-green shrink-0" /> <span className="truncate">HISTORIAL DE SALIDAS</span>
                   </h2>
-                  <p className="text-white/60 text-[10px] font-black uppercase tracking-widest mt-1">Registros de las últimas 24 horas</p>
+                  <p className="text-white/60 text-[10px] font-black uppercase tracking-widest mt-1 truncate">Registros de las últimas 24 horas</p>
                 </div>
                 <button 
                   onClick={() => setShowHistory(false)}
-                  className="relative z-10 bg-white/10 hover:bg-white/20 p-2 rounded-xl transition-all"
+                  className="relative z-10 bg-white/10 hover:bg-white/20 p-2 rounded-xl transition-all ml-4 shrink-0"
                 >
                   <X size={24} />
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-8 space-y-4 bg-slate-50/50">
+              <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-4 bg-slate-50/50">
                 {LOGISTICS_OUT.concat(LOGISTICS_OUT).map((job, idx) => (
                   <SmartTooltip key={idx} text="Registro histórico del envío">
                     <motion.div 
@@ -661,21 +661,21 @@ export default function App() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.05 }}
-                      className="flex flex-col bg-white p-5 rounded-3xl border border-slate-100 hover:border-brand-blue/20 transition-all shadow-sm group"
+                      className="flex flex-col bg-white p-4 md:p-5 rounded-3xl border border-slate-100 hover:border-brand-blue/20 transition-all shadow-sm group"
                     >
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-4">
-                          <div className="h-12 w-12 rounded-2xl bg-brand-blue/5 flex items-center justify-center text-brand-blue group-hover:scale-105 transition-transform">
-                            <Truck size={24} className="text-brand-green" />
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-3 md:gap-4 min-w-0">
+                          <div className="h-10 md:h-12 w-10 md:w-12 shrink-0 rounded-2xl bg-brand-blue/5 flex items-center justify-center text-brand-blue group-hover:scale-105 transition-transform">
+                            <Truck size={20} className="text-brand-green" />
                           </div>
-                          <div>
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Orden de Salida</p>
-                            <p className="text-xl font-black text-brand-blue tracking-tight">{job.id.replace('#', '')}</p>
+                          <div className="min-w-0">
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1 truncate">Orden de Salida</p>
+                            <p className="text-lg md:text-xl font-black text-brand-blue tracking-tight truncate">{job.id.replace('#', '')}</p>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Sucursal Destino</p>
-                          <span className="text-[10px] bg-brand-blue text-white px-3 py-1 rounded-full font-black uppercase tracking-tighter shadow-sm border border-brand-blue/10">
+                        <div className="text-right shrink-0">
+                          <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1 whitespace-nowrap">Sucursal Destino</p>
+                          <span className="inline-block text-[10px] bg-brand-blue text-white px-3 py-1 rounded-full font-black uppercase tracking-tighter shadow-sm border border-brand-blue/10 whitespace-nowrap">
                             {job.destination}
                           </span>
                         </div>
@@ -697,6 +697,10 @@ export default function App() {
           </div>
         )}
       </AnimatePresence>
+
+      <footer className="mt-auto py-10 text-center text-slate-400 text-xs font-medium">
+        <p>© 2026 Sistema de Gestión de Laboratorio Óptico v1.0.0-Beta</p>
+      </footer>
     </div>
   );
 }
