@@ -301,16 +301,7 @@ const LogisticsOutSection: React.FC<{ onOpenHistory: () => void }> = ({ onOpenHi
                     <span className="text-[8px] text-slate-500 font-black uppercase tracking-widest mb-0.5">Sucursal</span>
                     <span className="text-[10px] text-brand-green font-black uppercase tracking-widest px-2 py-0.5 bg-brand-green/10 rounded-md border border-brand-green/20">{job.destination}</span>
                   </div>
-                  <span className="text-[10px] font-mono text-slate-400 mt-1 font-bold">{job.exitTime.replace(' p. m.', ' PM').replace(' a. m.', ' AM')}</span>
                 </div>
-              </div>
-
-              <div className="flex flex-wrap gap-2 border-t border-white/5 pt-3 mt-1">
-                {job.items.map((item, i) => (
-                  <span key={i} className="text-[9px] bg-white/5 text-slate-300 px-2 py-1 rounded-lg border border-white/5 group-hover:border-white/10 transition-colors uppercase font-bold tracking-wider">
-                    {item}
-                  </span>
-                ))}
               </div>
             </motion.div>
           </SmartTooltip>
@@ -687,20 +678,6 @@ export default function App() {
                           <span className="text-[10px] bg-brand-blue text-white px-3 py-1 rounded-full font-black uppercase tracking-tighter shadow-sm border border-brand-blue/10">
                             {job.destination}
                           </span>
-                          <p className="text-[10px] font-mono text-slate-400 mt-2 font-bold flex items-center justify-end gap-1">
-                            <Clock size={10} /> {job.exitTime}
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 gap-2 pt-4 border-t border-slate-50">
-                        <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-1">Contenido del paquete</p>
-                        <div className="flex flex-wrap gap-2">
-                          {job.items.map((item, i) => (
-                            <span key={i} className="text-[9px] font-black text-slate-600 bg-slate-100 border border-slate-200 px-3 py-1 rounded-lg uppercase tracking-wider group-hover:bg-brand-blue group-hover:text-white group-hover:border-brand-blue transition-colors">
-                              {item}
-                            </span>
-                          ))}
                         </div>
                       </div>
                     </motion.div>
@@ -720,10 +697,6 @@ export default function App() {
           </div>
         )}
       </AnimatePresence>
-
-      <footer className="mt-auto py-10 text-center text-slate-400 text-xs font-medium">
-        <p>© 2026 Sistema de Gestión de Laboratorio Óptico v1.0.0-Beta</p>
-      </footer>
     </div>
   );
 }
