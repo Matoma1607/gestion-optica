@@ -79,6 +79,9 @@ const LOGISTICS_OUT: { id: string; destination: string; exitTime: string; items:
 const SmartTooltip: React.FC<{ text: string; children: React.ReactNode; position?: 'top' | 'bottom' | 'side'; className?: string }> = ({ text, children, position = 'top', className = '' }) => {
   const [isHovered, setIsHovered] = useState(false);
 
+  // Position logic: on mobile (sm) we prefer top/bottom over side
+  const finalPosition = position === 'side' ? 'lg:side' : position;
+
   return (
     <div 
       className={`relative ${className}`} 
@@ -89,36 +92,23 @@ const SmartTooltip: React.FC<{ text: string; children: React.ReactNode; position
       <AnimatePresence>
         {isHovered && (
           <motion.div
-            initial={{ 
-              opacity: 0, 
-              x: position === 'side' ? -10 : '-50%',
-              y: position === 'top' ? 10 : position === 'bottom' ? -10 : '-50%',
-              scale: 0.95 
-            }}
-            animate={{ 
-              opacity: 1, 
-              x: position === 'side' ? -20 : '-50%',
-              y: position === 'top' ? 0 : position === 'bottom' ? 0 : '-50%',
-              scale: 1 
-            }}
-            exit={{ 
-              opacity: 0, 
-              scale: 0.95 
-            }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.1 }}
-            className={`absolute z-[100] ${
-              position === 'top' ? 'bottom-full mb-3 left-1/2' : 
-              position === 'bottom' ? 'top-full mt-3 left-1/2' : 
-              'right-full mr-4 top-1/2'
-            } px-4 py-2 bg-brand-blue text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-2xl border border-white/10 whitespace-nowrap pointer-events-none flex items-center gap-2`}
+            className={`absolute z-[100] px-4 py-2 bg-brand-blue text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-2xl border border-white/10 whitespace-nowrap pointer-events-none flex items-center gap-2
+              ${position === 'top' ? 'bottom-full mb-3 left-1/2 -translate-x-1/2' : 
+                position === 'bottom' ? 'top-full mt-3 left-1/2 -translate-x-1/2' : 
+                'bottom-full mb-3 left-1/2 -translate-x-1/2 lg:bottom-auto lg:mb-0 lg:right-full lg:mr-4 lg:top-1/2 lg:-translate-y-1/2 lg:left-auto lg:translate-x-0'
+              }`}
           >
             <div className="h-1.5 w-1.5 rounded-full bg-brand-green animate-pulse"></div>
             {text}
-            <div className={`absolute ${
-              position === 'top' ? 'top-full left-1/2 -translate-x-1/2 border-t-brand-blue' : 
-              position === 'bottom' ? 'bottom-full left-1/2 -translate-x-1/2 border-b-brand-blue' : 
-              'left-full top-1/2 -translate-y-1/2 border-l-brand-blue'
-            } border-[6px] border-transparent`} />
+            <div className={`absolute border-[6px] border-transparent
+              ${position === 'top' ? 'top-full left-1/2 -translate-x-1/2 border-t-brand-blue' : 
+                position === 'bottom' ? 'bottom-full left-1/2 -translate-x-1/2 border-b-brand-blue' : 
+                'top-full left-1/2 -translate-x-1/2 border-t-brand-blue lg:top-1/2 lg:-translate-y-1/2 lg:left-full lg:translate-x-0 lg:border-t-transparent lg:border-l-brand-blue'
+              }`} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -247,7 +237,12 @@ const LogisticsOutSection: React.FC<{ onOpenHistory: () => void }> = ({ onOpenHi
       
       <div className="space-y-4 flex-1">
         {LOGISTICS_OUT.map((job, idx) => (
-          <SmartTooltip key={job.id} text={`Envío a sucursal ${job.destination}`} position="side" className="w-full">
+          <SmartTooltip 
+            key={job.id} 
+            text={`Envío a sucursal ${job.destination}`} 
+            position="side" 
+            className="w-full"
+          >
             <motion.div 
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -397,7 +392,7 @@ export default function App() {
 
         {/* Bottom Section: Main Table Split in Two Panels */}
         <section className="space-y-6">
-          <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
               <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
                 <ClipboardList className="text-brand-blue" />
@@ -456,8 +451,8 @@ export default function App() {
               const panelOrders = filteredOrders.filter((_, i) => i % 2 === panelIdx);
               return (
                 <div key={panelIdx} className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
+                  <div className="overflow-x-auto scrollbar-hide">
+                    <table className="w-full text-left border-collapse min-w-[600px]">
                       <thead>
                         <tr className="bg-slate-50/50">
                           <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 w-24">Orden</th>
