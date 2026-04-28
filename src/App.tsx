@@ -54,7 +54,7 @@ type Stage =
   | 'Superficie' 
   | 'Antireflejo';
 
-type Status = 'Vencida' | 'En Riesgo' | 'A tiempo';
+type Status = 'Vencida' | 'Retrasado' | 'A tiempo';
 
 interface Order {
   id: string; // #0000 format
@@ -91,20 +91,20 @@ const STAGES: Stage[] = [
 const INITIAL_ORDERS: Order[] = [
   { id: '#10056', location: '24 de Septiembre', promisedTime: '12:10', stage: 'Logística', remainingTime: -5, status: 'Vencida' },
   { id: '#10112', location: '9 de Julio', promisedTime: '15:55', stage: 'Calibrado', remainingTime: 79, status: 'A tiempo' },
-  { id: '#10166', location: 'Aguilares', promisedTime: '13:45', stage: 'Antireflejo', remainingTime: 45, status: 'En Riesgo' },
+  { id: '#10166', location: 'Aguilares', promisedTime: '13:45', stage: 'Antireflejo', remainingTime: 45, status: 'Retrasado' },
   { id: '#10385', location: 'Solmar Alem', promisedTime: '16:00', stage: 'Yerba Buena', remainingTime: 84, status: 'A tiempo' },
-  { id: '#10281', location: 'Solmar Mendoza', promisedTime: '14:20', stage: 'Superficie', remainingTime: 34, status: 'En Riesgo' },
+  { id: '#10281', location: 'Solmar Mendoza', promisedTime: '14:20', stage: 'Superficie', remainingTime: 34, status: 'Retrasado' },
   { id: '#10299', location: 'Junín', promisedTime: '12:30', stage: 'Cristales', remainingTime: 0, status: 'Vencida' },
-  { id: '#10197', location: 'Lutz Ferrando', promisedTime: '15:15', stage: 'Antireflejo', remainingTime: 57, status: 'En Riesgo' },
+  { id: '#10197', location: 'Lutz Ferrando', promisedTime: '15:15', stage: 'Antireflejo', remainingTime: 57, status: 'Retrasado' },
   { id: '#10510', location: 'Maipú', promisedTime: '17:00', stage: 'Calibrado', remainingTime: 120, status: 'A tiempo' },
   { id: '#10017', location: 'Yerba Buena', promisedTime: '14:45', stage: 'Casa Central', remainingTime: 86, status: 'A tiempo' },
-  { id: '#10104', location: 'Concepción', promisedTime: '15:52', stage: 'Concepción', remainingTime: 52, status: 'En Riesgo' },
-  { id: '#10082', location: '24 de Septiembre', promisedTime: '14:23', stage: 'Moto 1', remainingTime: 15, status: 'En Riesgo' },
+  { id: '#10104', location: 'Concepción', promisedTime: '15:52', stage: 'Concepción', remainingTime: 52, status: 'Retrasado' },
+  { id: '#10082', location: '24 de Septiembre', promisedTime: '14:23', stage: 'Moto 1', remainingTime: 15, status: 'Retrasado' },
   { id: '#10621', location: '9 de Julio', promisedTime: '18:10', stage: 'Moto 2', remainingTime: 145, status: 'A tiempo' },
   { id: '#10744', location: 'Aguilares', promisedTime: '19:30', stage: 'Armazones', remainingTime: 230, status: 'A tiempo' },
   { id: '#10812', location: 'Solmar Alem', promisedTime: '11:15', stage: 'Opticenter', remainingTime: -120, status: 'Vencida' },
-  { id: '#10915', location: 'Yerba Buena', promisedTime: '16:45', stage: 'Solmar 2', remainingTime: 35, status: 'En Riesgo' },
-  { id: '#10999', location: 'Lutz Ferrando', promisedTime: '15:20', stage: 'Lutz Ferrand', remainingTime: 25, status: 'En Riesgo' },
+  { id: '#10915', location: 'Yerba Buena', promisedTime: '16:45', stage: 'Solmar 2', remainingTime: 35, status: 'Retrasado' },
+  { id: '#10999', location: 'Lutz Ferrando', promisedTime: '15:20', stage: 'Lutz Ferrand', remainingTime: 25, status: 'Retrasado' },
 ];
 
 const LOGISTICS_OUT: { id: string; destination: string; exitTime: string; items: string[] }[] = [
@@ -155,8 +155,8 @@ const FullSummaryModal: React.FC<{
   isOpen: boolean;
   onClose: () => void;
   orders: Order[];
-  filter: 'Todas' | 'Vencidas' | 'En Riesgo';
-  setFilter: (f: 'Todas' | 'Vencidas' | 'En Riesgo') => void;
+  filter: 'Todas' | 'Vencidas' | 'Retrasado';
+  setFilter: (f: 'Todas' | 'Vencidas' | 'Retrasado') => void;
   selectedStage: Stage | null;
   setSelectedStage: (s: Stage | null) => void;
   filterCounts: Record<string, number>;
@@ -195,7 +195,7 @@ const FullSummaryModal: React.FC<{
 
             <div className="flex items-center gap-4 w-full md:w-auto">
               <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10 flex-1 md:flex-none">
-                {(['Todas', 'Vencidas', 'En Riesgo'] as const).map((f) => (
+                {(['Todas', 'Vencidas', 'Retrasado'] as const).map((f) => (
                   <button
                     key={f}
                     onClick={() => setFilter(f)}
@@ -209,7 +209,7 @@ const FullSummaryModal: React.FC<{
                     {filterCounts[f] > 0 && (
                       <span className={`flex items-center justify-center min-w-[18px] h-4.5 px-1 rounded-full text-[9px] font-black ${
                         f === 'Vencidas' ? 'bg-brand-red text-white' : 
-                        f === 'En Riesgo' ? 'bg-brand-orange text-white' : 
+                        f === 'Retrasado' ? 'bg-brand-orange text-white' : 
                         'bg-white/20 text-white'
                       }`}>
                         {filterCounts[f]}
@@ -311,7 +311,7 @@ const MonitorView: React.FC<{
   orders: Order[];
   getStatusColor: (status: Status) => string;
 }> = ({ orders, getStatusColor }) => {
-  const [filter, setFilter] = useState<'Todas' | 'Vencidas' | 'En Riesgo'>('Todas');
+  const [filter, setFilter] = useState<'Todas' | 'Vencidas' | 'Retrasado'>('Todas');
   const [selectedStage, setSelectedStage] = useState<Stage | null>(null);
 
   const filteredOrders = useMemo(() => {
@@ -325,7 +325,7 @@ const MonitorView: React.FC<{
   const filterCounts = useMemo(() => ({
     Todas: orders.length,
     Vencidas: orders.filter(o => o.status === 'Vencida').length,
-    'En Riesgo': orders.filter(o => o.status === 'En Riesgo').length,
+    'Retrasado': orders.filter(o => o.status === 'Retrasado').length,
   }), [orders]);
 
   return (
@@ -349,7 +349,7 @@ const MonitorView: React.FC<{
         </div>
 
         <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10">
-          {(['Todas', 'Vencidas', 'En Riesgo'] as const).map((f) => (
+          {(['Todas', 'Vencidas', 'Retrasado'] as const).map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
@@ -363,7 +363,7 @@ const MonitorView: React.FC<{
               {filterCounts[f] > 0 && (
                 <span className={`flex items-center justify-center min-w-[22px] h-5.5 px-2 rounded-full text-xs font-black ${
                   f === 'Vencidas' ? 'bg-brand-red text-white' : 
-                  f === 'En Riesgo' ? 'bg-brand-orange text-white' : 
+                  f === 'Retrasado' ? 'bg-brand-orange text-white' : 
                   'bg-white/20 text-white'
                 }`}>
                   {filterCounts[f]}
@@ -633,7 +633,7 @@ const LogisticsOutSection: React.FC<{ onOpenHistory: () => void }> = ({ onOpenHi
 // --- Main App Component ---
 
 export default function App() {
-  const [filter, setFilter] = useState<'Todas' | 'Vencidas' | 'En Riesgo'>('Todas');
+  const [filter, setFilter] = useState<'Todas' | 'Vencidas' | 'Retrasado'>('Todas');
   const [showHistory, setShowHistory] = useState(false);
   const [showFullSummary, setShowFullSummary] = useState(false);
   const [selectedStage, setSelectedStage] = useState<Stage | null>(null);
@@ -656,7 +656,7 @@ export default function App() {
   const getStatusColor = (status: Status) => {
     switch (status) {
       case 'Vencida': return 'bg-brand-red text-white';
-      case 'En Riesgo': return 'bg-brand-orange text-white';
+      case 'Retrasado': return 'bg-brand-orange text-white';
       default: return 'bg-brand-green text-white';
     }
   };
@@ -693,7 +693,7 @@ export default function App() {
   const filterCounts = useMemo(() => ({
     Todas: orders.length,
     Vencidas: orders.filter(o => o.status === 'Vencida').length,
-    'En Riesgo': orders.filter(o => o.status === 'En Riesgo').length,
+    'Retrasado': orders.filter(o => o.status === 'Retrasado').length,
   }), [orders]);
 
   if (view === 'monitor') {
