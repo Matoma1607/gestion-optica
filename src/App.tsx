@@ -552,13 +552,13 @@ const MonitorView: React.FC<{
   return (
     <div className="min-h-screen bg-slate-900 flex flex-col font-sans">
       {/* Header del Monitor */}
-      <header className="p-6 md:p-8 border-b border-white/10 flex justify-between items-center bg-slate-900/50 backdrop-blur-xl sticky top-0 z-50">
-        <div className="flex items-center gap-6">
-          <div className="h-14 w-14 rounded-[1.5rem] bg-brand-blue flex items-center justify-center text-white shadow-2xl shadow-brand-blue/40 border border-white/20">
+      <header className="p-6 md:p-8 border-b border-white/10 flex flex-col lg:flex-row justify-between items-center bg-slate-900/50 backdrop-blur-xl sticky top-0 z-50 gap-6">
+        <div className="flex items-center gap-6 w-full lg:w-auto">
+          <div className="h-14 w-14 shrink-0 rounded-[1.5rem] bg-brand-blue flex items-center justify-center text-white shadow-2xl shadow-brand-blue/40 border border-white/20">
             <ClipboardList size={32} />
           </div>
           <div>
-            <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight uppercase italic leading-none">
+            <h1 className="text-2xl md:text-4xl font-black text-white tracking-tight uppercase italic leading-none">
               Monitor Central de Órdenes
             </h1>
             <div className="flex items-center gap-3 mt-2">
@@ -573,18 +573,19 @@ const MonitorView: React.FC<{
           </div>
         </div>
 
-        <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10">
+        <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10 w-full lg:w-auto overflow-x-auto scrollbar-hide">
           {(["Todas", "Vencidas", "Retrasado"] as const).map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-8 py-3 rounded-xl text-sm font-black transition-all whitespace-nowrap flex items-center justify-center gap-3 ${
+              className={`flex-1 lg:flex-none px-6 lg:px-8 py-3 rounded-xl text-sm font-black transition-all whitespace-nowrap flex items-center justify-center gap-3 ${
                 filter === f
                   ? (f === "Vencidas"
                       ? "bg-brand-red text-white"
                       : f === "Retrasado"
                         ? "bg-brand-orange text-white"
-                        : "bg-white text-brand-blue") + " shadow-2xl scale-105"
+                        : "bg-white text-brand-blue") +
+                    " shadow-2xl scale-105 z-10"
                   : "text-white/40 hover:text-white hover:bg-white/5"
               }`}
             >
@@ -610,8 +611,8 @@ const MonitorView: React.FC<{
       </header>
 
       {/* Tablas del Monitor Divididas */}
-      <main className="flex-1 p-6 md:p-8 overflow-auto">
-        <div className="max-w-[1900px] mx-auto">
+      <main className="flex-1 p-4 md:p-8 overflow-auto">
+        <div className="max-w-[1900px] mx-auto min-h-full">
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
             {[0, 1].map((panelIdx) => {
               const panelOrders = filteredOrders.filter(
@@ -619,88 +620,102 @@ const MonitorView: React.FC<{
               );
               return (
                 <div
-                  key={panelIdx}
-                  className="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/10"
+                  key={`${panelIdx}-${filter}`}
+                  className="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/10 h-fit"
                 >
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="bg-slate-50">
-                        <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic w-24">
-                          Orden
-                        </th>
-                        <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic">
-                          Sucursal
-                        </th>
-                        <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic text-center">
-                          T. Rest
-                        </th>
-                        <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic text-right">
-                          Estado
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-50">
-                      <AnimatePresence mode="popLayout">
-                        {panelOrders.map((order, idx) => (
-                          <motion.tr
-                            key={order.id}
-                            layout
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                            transition={{ duration: 0.2, delay: idx * 0.03 }}
-                            className="hover:bg-slate-50 transition-colors group"
-                          >
-                            <td className="px-6 py-6">
-                              <span className="text-xl font-black text-brand-blue tracking-tighter font-mono">
-                                #{order.id.replace("#", "")}
-                              </span>
-                            </td>
-                            <td className="px-6 py-6">
-                              <div className="flex flex-col min-w-0">
-                                <span className="font-black text-slate-800 text-base tracking-tight truncate">
-                                  {order.location}
-                                </span>
-                                <span className="text-[10px] text-brand-blue font-bold uppercase tracking-tight truncate opacity-70">
-                                  {order.stage}
-                                </span>
-                              </div>
-                            </td>
-                            <td className="px-6 py-6 text-center">
-                              <span
-                                className={`text-2xl font-black ${
-                                  order.remainingTime <= 0
-                                    ? "text-brand-red animate-pulse"
-                                    : order.remainingTime <= 60
-                                      ? "text-brand-orange"
-                                      : "text-brand-green"
-                                }`}
-                              >
-                                {order.remainingTime}'
-                              </span>
-                            </td>
-                            <td className="px-6 py-6 text-right">
-                              <span
-                                className={`text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest shadow-md inline-block ${getStatusColor(order.status)}`}
-                              >
-                                {order.status}
-                              </span>
-                            </td>
-                          </motion.tr>
-                        ))}
-                      </AnimatePresence>
-                      {panelOrders.length === 0 && panelIdx === 0 && (
-                        <tr>
-                          <td
-                            colSpan={4}
-                            className="py-20 text-center text-slate-300 font-bold uppercase tracking-widest"
-                          >
-                            No hay órdenes pendientes
-                          </td>
+                  <div className="overflow-x-auto min-w-full">
+                    <table className="w-full text-left border-collapse min-w-[500px]">
+                      <thead>
+                        <tr className="bg-slate-50">
+                          <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic w-24">
+                            Orden
+                          </th>
+                          <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic">
+                            Sucursal
+                          </th>
+                          <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic text-center w-24">
+                            T. Rest
+                          </th>
+                          <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic text-right w-32">
+                            Estado
+                          </th>
                         </tr>
-                      )}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className="divide-y divide-slate-50 relative">
+                        <AnimatePresence mode="popLayout" initial={false}>
+                          {panelOrders.length > 0 ? (
+                            panelOrders.map((order, idx) => (
+                              <motion.tr
+                                key={order.id}
+                                layout
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: 10, scale: 0.98 }}
+                                transition={{
+                                  duration: 0.2,
+                                  delay: idx * 0.03,
+                                  layout: { duration: 0.3 },
+                                }}
+                                className="hover:bg-slate-50 transition-colors group"
+                              >
+                                <td className="px-6 py-5">
+                                  <span className="text-xl font-black text-brand-blue tracking-tighter font-mono">
+                                    #{order.id.replace("#", "")}
+                                  </span>
+                                </td>
+                                <td className="px-6 py-5">
+                                  <div className="flex flex-col min-w-0">
+                                    <span className="font-black text-slate-800 text-base tracking-tight truncate">
+                                      {order.location}
+                                    </span>
+                                    <span className="text-[10px] text-brand-blue font-bold uppercase tracking-tight truncate opacity-70">
+                                      {order.stage}
+                                    </span>
+                                  </div>
+                                </td>
+                                <td className="px-6 py-5 text-center">
+                                  <span
+                                    className={`text-2xl font-black ${
+                                      order.remainingTime <= 0
+                                        ? "text-brand-red animate-pulse"
+                                        : order.remainingTime <= 60
+                                          ? "text-brand-orange"
+                                          : "text-brand-green"
+                                    }`}
+                                  >
+                                    {order.remainingTime}'
+                                  </span>
+                                </td>
+                                <td className="px-6 py-5 text-right">
+                                  <span
+                                    className={`text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest shadow-md inline-block whitespace-nowrap ${getStatusColor(order.status)}`}
+                                  >
+                                    {order.status}
+                                  </span>
+                                </td>
+                              </motion.tr>
+                            ))
+                          ) : (
+                            <motion.tr
+                              key="empty"
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                            >
+                              <td
+                                colSpan={4}
+                                className="py-20 text-center text-slate-300 font-bold uppercase tracking-widest italic"
+                              >
+                                {panelIdx === 0
+                                  ? "Sin órdenes en esta sección"
+                                  : ""}
+                              </td>
+                            </motion.tr>
+                          )}
+                        </AnimatePresence>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               );
             })}
@@ -1131,7 +1146,8 @@ export default function App() {
                   Monitor de Órdenes Detallado
                 </h2>
                 <p className="text-white/60 text-lg font-medium mt-2 max-w-xl">
-                  Abre el panel de control extendido en una nueva pestaña.
+                  Abre el panel de control extendido en una nueva pestaña para
+                  visualizar en un monitor secundario con máxima claridad.
                 </p>
               </div>
             </div>
