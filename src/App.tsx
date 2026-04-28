@@ -201,20 +201,21 @@ const FullSummaryModal: React.FC<{
                     onClick={() => setFilter(f)}
                     className={`flex-1 md:flex-none px-6 py-2.5 rounded-xl text-xs font-black transition-all whitespace-nowrap flex items-center justify-center gap-2 ${
                       filter === f 
-                        ? 'bg-white text-brand-blue shadow-lg scale-105' 
+                        ? (f === 'Vencidas' ? 'bg-brand-red text-white' : f === 'Retrasado' ? 'bg-brand-orange text-white' : 'bg-white text-brand-blue') + ' shadow-lg scale-105'
                         : 'text-white/40 hover:text-white'
                     }`}
                   >
                     <span>{f}</span>
-                    {filterCounts[f] > 0 && (
-                      <span className={`flex items-center justify-center min-w-[18px] h-4.5 px-1 rounded-full text-[9px] font-black ${
-                        f === 'Vencidas' ? 'bg-brand-red text-white' : 
-                        f === 'Retrasado' ? 'bg-brand-orange text-white' : 
-                        'bg-white/20 text-white'
-                      }`}>
-                        {filterCounts[f]}
-                      </span>
-                    )}
+              {filterCounts[f] > 0 && (
+                <span className={`flex items-center justify-center min-w-[18px] h-4.5 px-1 rounded-full text-[9px] font-black ${
+                  filter === f ? 'bg-white/20 text-white' :
+                  f === 'Vencidas' ? 'bg-brand-red text-white' : 
+                  f === 'Retrasado' ? 'bg-brand-orange text-white' : 
+                  'bg-white/20 text-white'
+                }`}>
+                  {filterCounts[f]}
+                </span>
+              )}
                   </button>
                 ))}
               </div>
@@ -355,13 +356,14 @@ const MonitorView: React.FC<{
               onClick={() => setFilter(f)}
               className={`px-8 py-3 rounded-xl text-sm font-black transition-all whitespace-nowrap flex items-center justify-center gap-3 ${
                 filter === f 
-                  ? 'bg-white text-brand-blue shadow-2xl scale-105' 
+                  ? (f === 'Vencidas' ? 'bg-brand-red text-white' : f === 'Retrasado' ? 'bg-brand-orange text-white' : 'bg-white text-brand-blue') + ' shadow-2xl scale-105'
                   : 'text-white/40 hover:text-white hover:bg-white/5'
               }`}
             >
               <span>{f}</span>
               {filterCounts[f] > 0 && (
                 <span className={`flex items-center justify-center min-w-[22px] h-5.5 px-2 rounded-full text-xs font-black ${
+                  filter === f ? 'bg-white/20 text-white' :
                   f === 'Vencidas' ? 'bg-brand-red text-white' : 
                   f === 'Retrasado' ? 'bg-brand-orange text-white' : 
                   'bg-white/20 text-white'
