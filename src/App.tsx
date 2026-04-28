@@ -668,10 +668,6 @@ export default function App() {
     }
   };
 
-  if (view === 'monitor') {
-    return <MonitorView orders={orders} getStatusColor={getStatusColor} />;
-  }
-
   const filteredOrders = useMemo(() => {
     let result = orders;
     if (filter !== 'Todas') {
@@ -706,6 +702,10 @@ export default function App() {
     Vencidas: orders.filter(o => o.status === 'Vencida').length,
     'En Riesgo': orders.filter(o => o.status === 'En Riesgo').length,
   }), [orders]);
+
+  if (view === 'monitor') {
+    return <MonitorView orders={orders} getStatusColor={getStatusColor} />;
+  }
 
   const getStageIcon = (stage: Stage) => {
     switch (stage) {
