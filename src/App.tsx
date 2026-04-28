@@ -17,6 +17,7 @@ import {
   Wrench,
   History,
   X,
+  Maximize2,
   LucideIcon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -115,9 +116,6 @@ const LOGISTICS_OUT: { id: string; destination: string; exitTime: string; items:
 const SmartTooltip: React.FC<{ text: string; children: React.ReactNode; position?: 'top' | 'bottom' | 'side'; className?: string }> = ({ text, children, position = 'top', className = '' }) => {
   const [isHovered, setIsHovered] = useState(false);
 
-  // Position logic: on mobile (sm) we prefer top/bottom over side
-  const finalPosition = position === 'side' ? 'lg:side' : position;
-
   return (
     <div 
       className={`relative ${className}`} 
@@ -149,6 +147,162 @@ const SmartTooltip: React.FC<{ text: string; children: React.ReactNode; position
         )}
       </AnimatePresence>
     </div>
+  );
+};
+
+const FullSummaryModal: React.FC<{
+  isOpen: boolean;
+  onClose: () => void;
+  orders: Order[];
+  filter: 'Todas' | 'Vencidas' | 'En Riesgo';
+  setFilter: (f: 'Todas' | 'Vencidas' | 'En Riesgo') => void;
+  selectedStage: Stage | null;
+  setSelectedStage: (s: Stage | null) => void;
+  filterCounts: Record<string, number>;
+  getStatusColor: (status: Status) => string;
+}> = ({ isOpen, onClose, orders, filter, setFilter, selectedStage, setSelectedStage, filterCounts, getStatusColor }) => {
+  const filteredOrders = useMemo(() => {
+    return orders.filter(o => {
+      const matchesFilter = filter === 'Todas' || o.status === filter;
+      const matchesStage = !selectedStage || o.stage === selectedStage;
+      return matchesFilter && matchesStage;
+    });
+  }, [orders, filter, selectedStage]);
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[200] bg-slate-900/95 backdrop-blur-md flex flex-col"
+        >
+          <div className="p-6 md:p-8 flex flex-col md:flex-row justify-between items-center gap-6 border-b border-white/10">
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 rounded-2xl bg-brand-blue flex items-center justify-center text-white shadow-xl shadow-brand-blue/20">
+                <ClipboardList size={28} />
+              </div>
+              <div>
+                <h2 className="text-2xl font-black text-white tracking-tight uppercase italic">Resumen de Órdenes Críticas</h2>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <div className="h-2 w-2 rounded-full bg-brand-green animate-pulse"></div>
+                  <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest">Monitor en Tiempo Real</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 w-full md:w-auto">
+              <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10 flex-1 md:flex-none">
+                {(['Todas', 'Vencidas', 'En Riesgo'] as const).map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => setFilter(f)}
+                    className={`flex-1 md:flex-none px-6 py-2.5 rounded-xl text-xs font-black transition-all whitespace-nowrap flex items-center justify-center gap-2 ${
+                      filter === f 
+                        ? 'bg-white text-brand-blue shadow-lg scale-105' 
+                        : 'text-white/40 hover:text-white'
+                    }`}
+                  >
+                    <span>{f}</span>
+                    {filterCounts[f] > 0 && (
+                      <span className={`flex items-center justify-center min-w-[18px] h-4.5 px-1 rounded-full text-[9px] font-black ${
+                        f === 'Vencidas' ? 'bg-brand-red text-white' : 
+                        f === 'En Riesgo' ? 'bg-brand-orange text-white' : 
+                        'bg-white/20 text-white'
+                      }`}>
+                        {filterCounts[f]}
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+              <button 
+                onClick={onClose}
+                className="bg-white/5 hover:bg-brand-red text-white p-3 rounded-2xl transition-all border border-white/10 hover:border-brand-red/50 group"
+              >
+                <X size={24} className="group-hover:rotate-90 transition-transform" />
+              </button>
+            </div>
+          </div>
+
+          <div className="flex-1 overflow-auto p-6 md:p-10">
+            <div className="max-w-6xl mx-auto">
+              <div className="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/10">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-slate-50">
+                      <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic">Orden</th>
+                      <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic">Local</th>
+                      <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic">Etapa Actual</th>
+                      <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic text-center">T. Restante</th>
+                      <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic text-right">Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-50">
+                    {filteredOrders.length > 0 ? (
+                      filteredOrders.map((order) => (
+                        <tr key={order.id} className="hover:bg-slate-50/80 transition-colors group">
+                          <td className="px-8 py-6">
+                            <span className="text-lg font-black text-brand-blue tracking-tight font-mono">#{order.id.replace('#', '')}</span>
+                          </td>
+                          <td className="px-8 py-6">
+                            <div className="flex flex-col">
+                              <span className="font-bold text-slate-800 text-base">{order.location}</span>
+                              <span className="text-[10px] text-slate-400 font-bold flex items-center gap-1 mt-0.5 uppercase tracking-wide">
+                                <Clock size={10} className="text-brand-blue" /> Prometido: {order.promisedTime}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-8 py-6">
+                            <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-tight border border-slate-200">
+                              {order.stage}
+                            </span>
+                          </td>
+                          <td className="px-8 py-6 text-center">
+                            <span className={`text-xl font-black ${
+                              order.remainingTime <= 0 ? 'text-brand-red animate-pulse' : 
+                              order.remainingTime <= 60 ? 'text-brand-orange' : 'text-brand-green'
+                            }`}>
+                              {order.remainingTime} <span className="text-xs uppercase ml-1">min</span>
+                            </span>
+                          </td>
+                          <td className="px-8 py-6 text-right">
+                            <span className={`text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-sm ${getStatusColor(order.status)}`}>
+                              {order.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={5} className="py-20 text-center">
+                          <div className="flex flex-col items-center gap-2 opacity-30">
+                            <ClipboardList size={48} />
+                            <p className="text-sm font-black uppercase tracking-widest">Sin órdenes para mostrar</p>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+              
+              {selectedStage && (
+                <div className="mt-8 flex justify-center">
+                  <button 
+                    onClick={() => setSelectedStage(null)}
+                    className="bg-brand-blue text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-brand-blue/90 transition-all shadow-xl shadow-brand-blue/20 flex items-center gap-3"
+                  >
+                    Borrar Filtro de Etapa ({selectedStage}) <X size={16} />
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 
@@ -327,6 +481,7 @@ const LogisticsOutSection: React.FC<{ onOpenHistory: () => void }> = ({ onOpenHi
 export default function App() {
   const [filter, setFilter] = useState<'Todas' | 'Vencidas' | 'En Riesgo'>('Todas');
   const [showHistory, setShowHistory] = useState(false);
+  const [showFullSummary, setShowFullSummary] = useState(false);
   const [selectedStage, setSelectedStage] = useState<Stage | null>(null);
   const [orders] = useState<Order[]>(INITIAL_ORDERS);
 
@@ -452,6 +607,13 @@ export default function App() {
               <h2 className="text-lg md:text-xl font-bold text-slate-800 flex items-center gap-2 flex-wrap">
                 <ClipboardList className="text-brand-blue shrink-0" />
                 <span className="truncate">Resumen Detallado de Órdenes Críticas</span>
+                <button 
+                  onClick={() => setShowFullSummary(true)}
+                  className="ml-2 p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-brand-blue transition-colors"
+                  title="Ver en pantalla completa"
+                >
+                  <Maximize2 size={16} />
+                </button>
               </h2>
               <div className="flex flex-wrap items-center gap-2 mt-1">
                 <p className="text-slate-500 text-xs md:text-sm">Lista en tiempo real dividida para mayor visibilidad</p>
@@ -697,6 +859,18 @@ export default function App() {
           </div>
         )}
       </AnimatePresence>
+
+      <FullSummaryModal 
+        isOpen={showFullSummary}
+        onClose={() => setShowFullSummary(false)}
+        orders={orders}
+        filter={filter}
+        setFilter={setFilter}
+        selectedStage={selectedStage}
+        setSelectedStage={setSelectedStage}
+        filterCounts={filterCounts}
+        getStatusColor={getStatusColor}
+      />
 
       <footer className="mt-auto py-10 text-center text-slate-400 text-xs font-medium">
         <p>© 2026 Sistema de Gestión de Laboratorio Óptico v1.0.0-Beta</p>
