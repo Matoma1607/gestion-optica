@@ -9,7 +9,6 @@ import {
   CheckCircle2, 
   TrendingUp, 
   Filter,
-  ArrowRight,
   ClipboardList,
   Eye,
   Activity,
@@ -18,6 +17,8 @@ import {
   History,
   X,
   Maximize2,
+  ExternalLink,
+  ArrowRight,
   LucideIcon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -306,6 +307,166 @@ const FullSummaryModal: React.FC<{
   );
 };
 
+const MonitorView: React.FC<{
+  orders: Order[];
+  getStatusColor: (status: Status) => string;
+}> = ({ orders, getStatusColor }) => {
+  const [filter, setFilter] = useState<'Todas' | 'Vencidas' | 'En Riesgo'>('Todas');
+  const [selectedStage, setSelectedStage] = useState<Stage | null>(null);
+
+  const filteredOrders = useMemo(() => {
+    return orders.filter(o => {
+      const matchesFilter = filter === 'Todas' || o.status === filter;
+      const matchesStage = !selectedStage || o.stage === selectedStage;
+      return matchesFilter && matchesStage;
+    });
+  }, [orders, filter, selectedStage]);
+
+  const filterCounts = useMemo(() => ({
+    Todas: orders.length,
+    Vencidas: orders.filter(o => o.status === 'Vencida').length,
+    'En Riesgo': orders.filter(o => o.status === 'En Riesgo').length,
+  }), [orders]);
+
+  return (
+    <div className="min-h-screen bg-slate-900 flex flex-col font-sans">
+      {/* Header del Monitor */}
+      <header className="p-6 md:p-8 border-b border-white/10 flex justify-between items-center bg-slate-900/50 backdrop-blur-xl sticky top-0 z-50">
+        <div className="flex items-center gap-6">
+          <div className="h-14 w-14 rounded-[1.5rem] bg-brand-blue flex items-center justify-center text-white shadow-2xl shadow-brand-blue/40 border border-white/20">
+            <ClipboardList size={32} />
+          </div>
+          <div>
+            <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight uppercase italic leading-none">Monitor Central de Órdenes</h1>
+            <div className="flex items-center gap-3 mt-2">
+              <div className="flex items-center gap-1.5 bg-brand-green/20 px-2 py-0.5 rounded-full border border-brand-green/30">
+                <div className="h-2 w-2 rounded-full bg-brand-green animate-pulse"></div>
+                <span className="text-brand-green text-[10px] font-black uppercase tracking-widest">SISTEMA ACTIVO</span>
+              </div>
+              <RealTimeClock />
+            </div>
+          </div>
+        </div>
+
+        <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10">
+          {(['Todas', 'Vencidas', 'En Riesgo'] as const).map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`px-8 py-3 rounded-xl text-sm font-black transition-all whitespace-nowrap flex items-center justify-center gap-3 ${
+                filter === f 
+                  ? 'bg-white text-brand-blue shadow-2xl scale-105' 
+                  : 'text-white/40 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <span>{f}</span>
+              {filterCounts[f] > 0 && (
+                <span className={`flex items-center justify-center min-w-[22px] h-5.5 px-2 rounded-full text-xs font-black ${
+                  f === 'Vencidas' ? 'bg-brand-red text-white' : 
+                  f === 'En Riesgo' ? 'bg-brand-orange text-white' : 
+                  'bg-white/20 text-white'
+                }`}>
+                  {filterCounts[f]}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+      </header>
+
+      {/* Tabla del Monitor */}
+      <main className="flex-1 p-8 md:p-12 overflow-auto">
+        <div className="max-w-[1600px] mx-auto">
+          <div className="bg-white rounded-[3.5rem] shadow-[0_35px_60px_-15px_rgba(0,0,0,0.3)] overflow-hidden border border-white/10">
+            <table className="w-full text-left border-collapse table-fixed lg:table-auto">
+              <thead>
+                <tr className="bg-slate-50">
+                  <th className="px-10 py-8 text-[13px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic w-1/6">Orden</th>
+                  <th className="px-10 py-8 text-[13px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic w-1/4">Sucursal / Local</th>
+                  <th className="px-10 py-8 text-[13px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic w-1/4">Etapa Actual</th>
+                  <th className="px-10 py-8 text-[13px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic text-center w-1/6">T. Restante</th>
+                  <th className="px-10 py-8 text-[13px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic text-right w-1/6">Estado</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                <AnimatePresence>
+                  {filteredOrders.map((order, idx) => (
+                    <motion.tr 
+                      key={order.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.05 }}
+                      className="hover:bg-slate-50/80 transition-colors group"
+                    >
+                      <td className="px-10 py-8">
+                        <span className="text-3xl font-black text-brand-blue tracking-tighter font-mono">#{order.id.replace('#', '')}</span>
+                      </td>
+                      <td className="px-10 py-8">
+                        <div className="flex flex-col">
+                          <span className="font-black text-slate-800 text-2xl tracking-tight">{order.location}</span>
+                          <span className="text-xs text-slate-400 font-bold flex items-center gap-2 mt-1 uppercase tracking-widest">
+                            <Clock size={14} className="text-brand-blue" /> Prometido a las {order.promisedTime}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-10 py-8">
+                        <div className="flex items-center gap-3">
+                          <div className="h-2 w-2 rounded-full bg-brand-blue shadow-glow animate-pulse"></div>
+                          <span className="bg-brand-blue/5 text-brand-blue px-5 py-2 rounded-2xl text-xs font-black uppercase tracking-widest border border-brand-blue/10">
+                            {order.stage}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-10 py-8 text-center">
+                        <span className={`text-4xl font-black ${
+                          order.remainingTime <= 0 ? 'text-brand-red animate-pulse' : 
+                          order.remainingTime <= 60 ? 'text-brand-orange' : 'text-brand-green'
+                        }`}>
+                          {order.remainingTime} <span className="text-sm uppercase -ml-1">min</span>
+                        </span>
+                      </td>
+                      <td className="px-10 py-8 text-right">
+                        <span className={`text-xs font-black px-6 py-2.5 rounded-full uppercase tracking-[0.2em] shadow-lg inline-block transform group-hover:scale-105 transition-transform ${getStatusColor(order.status)}`}>
+                          {order.status}
+                        </span>
+                      </td>
+                    </motion.tr>
+                  ))}
+                </AnimatePresence>
+                {filteredOrders.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="py-40 text-center">
+                      <motion.div 
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 0.3, scale: 1 }}
+                        className="flex flex-col items-center gap-6"
+                      >
+                        <ClipboardList size={80} />
+                        <p className="text-2xl font-black uppercase tracking-[0.3em]">Sin órdenes pendientes</p>
+                      </motion.div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+          
+          {selectedStage && (
+            <div className="mt-12 flex justify-center">
+              <button 
+                onClick={() => setSelectedStage(null)}
+                className="bg-brand-blue/10 text-brand-blue border border-brand-blue/20 px-10 py-5 rounded-3xl font-black uppercase tracking-widest text-sm hover:bg-brand-blue hover:text-white transition-all shadow-xl flex items-center gap-4 group"
+              >
+                Limpiar Filtro de Etapa: {selectedStage} <X size={20} className="group-hover:rotate-90 transition-transform" />
+              </button>
+            </div>
+          )}
+        </div>
+      </main>
+    </div>
+  );
+};
+
 // --- Sub-components ---
 
 const RealTimeClock: React.FC = () => {
@@ -485,6 +646,32 @@ export default function App() {
   const [selectedStage, setSelectedStage] = useState<Stage | null>(null);
   const [orders] = useState<Order[]>(INITIAL_ORDERS);
 
+  // Router logic
+  const [view, setView] = useState<'dashboard' | 'monitor'>('dashboard');
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('view') === 'monitor') {
+      setView('monitor');
+    }
+  }, []);
+
+  const handleOpenMonitor = () => {
+    window.open(window.location.pathname + '?view=monitor', '_blank');
+  };
+
+  const getStatusColor = (status: Status) => {
+    switch (status) {
+      case 'Vencida': return 'bg-brand-red text-white';
+      case 'En Riesgo': return 'bg-brand-orange text-white';
+      default: return 'bg-brand-green text-white';
+    }
+  };
+
+  if (view === 'monitor') {
+    return <MonitorView orders={orders} getStatusColor={getStatusColor} />;
+  }
+
   const filteredOrders = useMemo(() => {
     let result = orders;
     if (filter !== 'Todas') {
@@ -519,14 +706,6 @@ export default function App() {
     Vencidas: orders.filter(o => o.status === 'Vencida').length,
     'En Riesgo': orders.filter(o => o.status === 'En Riesgo').length,
   }), [orders]);
-
-  const getStatusColor = (status: Status) => {
-    switch (status) {
-      case 'Vencida': return 'bg-brand-red text-white';
-      case 'En Riesgo': return 'bg-brand-orange text-white';
-      case 'A tiempo': return 'bg-brand-green text-white';
-    }
-  };
 
   const getStageIcon = (stage: Stage) => {
     switch (stage) {
@@ -600,186 +779,31 @@ export default function App() {
           </div>
         </div>
 
-        {/* Bottom Section: Main Table Split in Two Panels */}
-        <section className="space-y-6">
-          <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-5 md:p-8 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 overflow-hidden">
-            <div className="flex-1 min-w-0">
-              <h2 className="text-lg md:text-xl font-bold text-slate-800 flex items-center gap-2 flex-wrap">
-                <ClipboardList className="text-brand-blue shrink-0" />
-                <span className="truncate">Resumen Detallado de Órdenes Críticas</span>
-                <button 
-                  onClick={() => setShowFullSummary(true)}
-                  className="ml-2 p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-brand-blue transition-colors"
-                  title="Ver en pantalla completa"
-                >
-                  <Maximize2 size={16} />
-                </button>
-              </h2>
-              <div className="flex flex-wrap items-center gap-2 mt-1">
-                <p className="text-slate-500 text-xs md:text-sm">Lista en tiempo real dividida para mayor visibilidad</p>
-                {selectedStage && (
-                  <motion.span 
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="bg-brand-blue/10 text-brand-blue px-2 py-0.5 rounded-md text-[9px] font-bold uppercase shrink-0"
-                  >
-                    Etapa: {selectedStage}
-                  </motion.span>
-                )}
+        {/* Bottom Section: Main Access to Monitor */}
+        <section className="mt-12">
+          <motion.button 
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={handleOpenMonitor}
+            className="w-full bg-brand-blue p-8 md:p-12 rounded-[3.5rem] shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8 group relative overflow-hidden text-white border border-white/10"
+          >
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 blur-3xl rounded-full -mr-32 -mt-32 transition-transform group-hover:scale-150 duration-700"></div>
+            <div className="relative z-10 flex items-center gap-8 min-w-0">
+              <div className="h-20 w-20 shrink-0 rounded-[2rem] bg-white/10 flex items-center justify-center text-white border border-white/20 group-hover:bg-brand-green group-hover:text-white transition-all duration-500 shadow-xl group-hover:shadow-brand-green/40">
+                <ExternalLink size={36} />
+              </div>
+              <div className="text-left min-w-0">
+                <h2 className="text-3xl md:text-4xl font-black italic tracking-tighter uppercase leading-tight">Monitor de Órdenes Detallado</h2>
+                <p className="text-white/60 text-lg font-medium mt-2 max-w-xl">Abre el panel de control extendido en una nueva pestaña para visualizar en un monitor secundario con máxima claridad.</p>
               </div>
             </div>
-            
-            <div className="w-full xl:w-auto">
-              <div className="flex bg-slate-100 p-1 rounded-2xl overflow-x-auto scrollbar-hide max-w-full">
-                {(['Todas', 'Vencidas', 'En Riesgo'] as const).map((f: 'Todas' | 'Vencidas' | 'En Riesgo') => (
-                  <SmartTooltip 
-                    key={f} 
-                    text={
-                      f === 'Todas' ? 'Ver todo el listado' : 
-                      f === 'Vencidas' ? 'Vencidas (≤0m)' : 
-                      'En Riesgo (≤60m)'
-                    }
-                    className="flex-1 xl:flex-none"
-                  >
-                    <button
-                      onClick={() => setFilter(f)}
-                      className={`w-full px-4 md:px-5 py-2 rounded-xl text-xs md:text-sm font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2 ${
-                        filter === f 
-                          ? 'bg-white text-slate-900 shadow-md transform scale-105' 
-                          : 'text-slate-500 hover:text-slate-700'
-                      }`}
-                    >
-                      <span>{f}</span>
-                      {filterCounts[f] > 0 && (
-                        <span className={`flex items-center justify-center min-w-[18px] h-4.5 px-1 rounded-full text-[9px] font-black ${
-                          f === 'Vencidas' ? 'bg-brand-red text-white' : 
-                          f === 'En Riesgo' ? 'bg-brand-orange text-white' : 
-                          'bg-slate-200 text-slate-600'
-                        }`}>
-                          {filterCounts[f]}
-                        </span>
-                      )}
-                    </button>
-                  </SmartTooltip>
-                ))}
+            <div className="relative z-10 shrink-0">
+              <div className="px-10 py-5 bg-white text-brand-blue rounded-3xl font-black uppercase tracking-[0.2em] text-sm shadow-[0_20px_40px_-5px_rgba(255,255,255,0.3)] group-hover:bg-brand-green group-hover:text-white transition-all flex items-center gap-4">
+                Abrir Monitor Central <ArrowRight size={24} />
               </div>
             </div>
-          </div>
-
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-            {[0, 1].map((panelIdx) => {
-              const panelOrders = filteredOrders.filter((_, i) => i % 2 === panelIdx);
-              return (
-                <div key={panelIdx} className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
-                  <div className="overflow-x-auto scrollbar-hide">
-                    <table className="w-full text-left border-collapse min-w-[600px]">
-                      <thead>
-                        <tr className="bg-slate-50/50">
-                          <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 w-24">Orden</th>
-                          <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">Local</th>
-                          <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">Etapa</th>
-                          <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">T. Rest</th>
-                          <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">Estado</th>
-                        </tr>
-                      </thead>
-                      <AnimatePresence>
-                        <motion.tbody 
-                          key={`${panelIdx}-${filter}-${selectedStage}`}
-                          className="divide-y divide-slate-50"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: 0.15 }}
-                        >
-                          {panelOrders.length > 0 ? (
-                            panelOrders.map((order: Order, idx: number) => (
-                              <motion.tr 
-                                key={order.id}
-                                initial={{ opacity: 0, y: 5 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: idx * 0.02 }}
-                                className="hover:bg-slate-50/80 transition-colors group"
-                              >
-                                <td className="px-6 py-4 font-mono text-xs font-bold text-brand-blue">{order.id}</td>
-                                <td className="px-6 py-4">
-                                  <div className="flex flex-col">
-                                    <span className="text-xs font-semibold text-slate-700 truncate max-w-[120px]">{order.location}</span>
-                                    <span className="text-[9px] text-slate-400 font-mono tracking-tighter flex items-center gap-1">
-                                      <Clock size={8} /> {order.promisedTime}
-                                    </span>
-                                  </div>
-                                </td>
-                                <td className="px-6 py-4">
-                                  <span className="text-[10px] font-medium px-2 py-0.5 bg-slate-100 rounded-md text-slate-600 border border-slate-200">
-                                    {order.stage}
-                                  </span>
-                                </td>
-                                <td className="px-6 py-4">
-                                  <span className={`text-xs font-mono font-bold ${
-                                    order.remainingTime <= 0 ? 'text-brand-red' : 
-                                    order.remainingTime <= 60 ? 'text-brand-orange' : 'text-brand-green'
-                                  }`}>
-                                    {order.remainingTime}'
-                                  </span>
-                                </td>
-                                <td className="px-6 py-4 text-right">
-                                  <SmartTooltip text={
-                                    order.status === 'Vencida' ? 'Atención inmediata requerida' :
-                                    order.status === 'En Riesgo' ? 'Tolerancia de 1 hora. Entrando en zona crítica.' :
-                                    'Pedido dentro del rango normal'
-                                  }>
-                                    <span className={`text-[9px] font-black px-2 py-1 rounded-full uppercase tracking-tighter ${getStatusColor(order.status)}`}>
-                                      {order.status}
-                                    </span>
-                                  </SmartTooltip>
-                                </td>
-                              </motion.tr>
-                            ))
-                          ) : (
-                            panelIdx === 0 && panelOrders.length === 0 && filteredOrders.length === 0 && (
-                              <motion.tr
-                                key="empty"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                              >
-                                <td colSpan={5} className="px-8 py-20 text-center text-slate-400">
-                                  No hay órdenes.
-                                </td>
-                              </motion.tr>
-                            )
-                          )}
-                        </motion.tbody>
-                      </AnimatePresence>
-                    </table>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          
-          <div className="p-6 bg-slate-900 rounded-[2rem] border border-white/5 flex flex-col md:flex-row items-center justify-between gap-4 text-[10px] text-slate-400 font-black uppercase tracking-widest">
-            <p className="flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-brand-green animate-pulse"></span>
-              SINCRONIZACIÓN ACTIVA - ACTUALIZACIÓN CADA 60S
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-6">
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-brand-red"></span>
-                <span>Vencida (≤0m)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-brand-orange"></span>
-                <span>Zona Crítica (≤60m)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-brand-green"></span>
-                <span>A Tiempo (&gt;60m)</span>
-              </div>
-            </div>
-          </div>
+          </motion.button>
         </section>
-
       </main>
 
       {/* History Modal Overlay */}
