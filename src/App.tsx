@@ -724,16 +724,15 @@ export default function App() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-50">
-                        <AnimatePresence mode="popLayout" initial={false}>
+                        <AnimatePresence initial={false}>
                           {panelOrders.length > 0 ? (
                             panelOrders.map((order) => (
                               <motion.tr 
                                 key={order.id}
-                                layout
-                                initial={{ opacity: 0, x: panelIdx === 0 ? -10 : 10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, scale: 0.95 }}
-                                transition={{ duration: 0.2 }}
+                                initial={{ opacity: 0, y: 4 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -4 }}
+                                transition={{ duration: 0.15 }}
                                 className="hover:bg-slate-50/80 transition-colors group"
                               >
                                 <td className="pl-8 pr-4 py-5">
@@ -762,7 +761,7 @@ export default function App() {
                             ))
                           ) : (
                             <motion.tr
-                              key={`empty-${panelIdx}`}
+                              key={`empty-${panelIdx}-${filter}`}
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
                               exit={{ opacity: 0 }}
@@ -771,7 +770,7 @@ export default function App() {
                                 <div className="flex flex-col items-center gap-3 opacity-20">
                                   <Box size={40} className="text-slate-400" />
                                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">
-                                    {panelIdx === 0 && filteredOrders.length === 0 ? 'Sin registros' : 'Fin de lista'}
+                                    {panelIdx === 0 && filteredOrders.length === 0 ? 'Sin registros' : 'Panel vacío'}
                                   </p>
                                 </div>
                               </td>
