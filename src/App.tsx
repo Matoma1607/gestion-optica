@@ -437,9 +437,13 @@ const LogisticsOutSection: React.FC<{ onOpenHistory: () => void }> = ({ onOpenHi
         </span>
         <button 
           onClick={onOpenHistory}
-          className="text-white/40 hover:text-white transition-all"
+          className="text-white/40 hover:text-white transition-all relative group/hist"
+          title="Abrir historial"
         >
           <History size={10} />
+          <span className="absolute right-full mr-2 top-0 px-1.5 py-0.5 bg-brand-blue text-[6px] font-black text-white uppercase tracking-tighter rounded border border-white/10 opacity-0 group-hover/hist:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20 shadow-xl">
+            Abrir historial
+          </span>
         </button>
       </div>
       
