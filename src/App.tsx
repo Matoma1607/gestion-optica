@@ -273,7 +273,7 @@ const MonitorView: React.FC<{
                                 className="hover:bg-slate-50 transition-colors group"
                               >
                                 <td className="px-4 md:px-6 py-4 md:py-5">
-                                  <span className="text-base md:text-xl font-black text-brand-blue tracking-tighter font-mono">#{order.id.replace('#', '')}</span>
+                                  <span className="text-base md:text-xl font-black text-brand-blue tracking-tighter font-mono">{order.id.replace('#', '')}</span>
                                 </td>
                                 <td className="px-4 md:px-6 py-4 md:py-5">
                                   <div className="flex flex-col min-w-0">
@@ -390,7 +390,7 @@ function StageProgressCard({ stage, count, colorClass, icon: Icon, isSelected, o
       whileHover={{ y: -2, scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       onClick={onClick}
-      className={`relative p-2 rounded-xl cursor-pointer transition-all flex flex-col items-center justify-center gap-1 group aspect-square w-[72px] shrink-0 ${
+      className={`relative p-1.5 rounded-xl cursor-pointer transition-all flex flex-col items-center justify-center gap-1 group aspect-square w-[60px] shrink-0 ${
         isSelected 
           ? 'bg-brand-blue shadow-lg shadow-brand-blue/20' 
           : 'bg-white border border-slate-100 shadow-sm hover:shadow-md hover:border-brand-blue/20'
@@ -398,7 +398,7 @@ function StageProgressCard({ stage, count, colorClass, icon: Icon, isSelected, o
     >
       {/* Task Count Badge */}
       {count > 0 && (
-        <div className={`absolute -top-1 -right-1 min-w-[18px] h-4.5 flex items-center justify-center rounded-full px-1 text-[8px] font-black z-10 shadow-sm border ${
+        <div className={`absolute -top-1 -right-1 min-w-[16px] h-4 flex items-center justify-center rounded-full px-1 text-[7px] font-black z-10 shadow-sm border ${
           isSelected 
             ? 'bg-brand-green text-brand-blue border-white/20' 
             : 'bg-brand-blue text-white border-white/10'
@@ -408,16 +408,16 @@ function StageProgressCard({ stage, count, colorClass, icon: Icon, isSelected, o
       )}
 
       {/* Main Icon Box */}
-      <div className={`p-1.5 rounded-lg transition-all group-hover:scale-110 ${
+      <div className={`p-1 rounded-lg transition-all group-hover:scale-110 ${
         isSelected 
           ? 'bg-white/20 text-white' 
           : `${colorClass.replace('bg-', 'bg-opacity-10 text-')}`
       }`}>
-        <Icon size={20} strokeWidth={2.5} />
+        <Icon size={16} strokeWidth={2.5} />
       </div>
       
       {/* Label */}
-      <span className={`text-[8px] font-black uppercase tracking-tighter text-center leading-[1.1] transition-colors line-clamp-2 w-full px-0.5 ${
+      <span className={`text-[7px] font-black uppercase tracking-tighter text-center leading-[1] transition-colors line-clamp-2 w-full px-0.5 ${
         isSelected ? 'text-white' : 'text-slate-600'
       }`}>
         {stage}
@@ -427,58 +427,40 @@ function StageProgressCard({ stage, count, colorClass, icon: Icon, isSelected, o
 }
 
 const LogisticsOutSection: React.FC<{ onOpenHistory: () => void }> = ({ onOpenHistory }) => (
-  <div className="bg-slate-900 text-white p-6 rounded-[2.5rem] shadow-2xl border border-white/5 relative overflow-hidden">
-    <div className="absolute top-0 right-0 w-32 h-32 bg-brand-green/10 blur-3xl rounded-full -mr-10 -mt-10"></div>
-    <div className="relative z-10 flex flex-col h-full">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-black flex items-center gap-2 uppercase tracking-tighter italic text-white/90">
-          <Truck size={24} className="text-brand-green" />
-          <span>TRABAJOS QUE SALIERON</span>
-        </h3>
+  <div className="bg-slate-900 text-white p-2 rounded-2xl shadow-xl border border-white/5 relative overflow-hidden h-[68px] flex flex-col shrink-0">
+    <div className="absolute top-0 right-0 w-16 h-16 bg-brand-green/10 blur-xl rounded-full -mr-4 -mt-4"></div>
+    <div className="relative z-10 flex flex-col h-full justify-between">
+      <div className="flex items-center justify-between">
+        <span className="text-[7px] font-black text-brand-green uppercase tracking-[0.2em] italic flex items-center gap-1">
+          <Truck size={10} />
+          Salidas
+        </span>
         <button 
           onClick={onOpenHistory}
-          className="px-4 py-2 bg-brand-green/10 hover:bg-brand-green/20 rounded-xl text-[10px] font-black text-brand-green uppercase tracking-widest border border-brand-green/20 transition-all flex items-center gap-2"
+          className="text-white/40 hover:text-white transition-all"
         >
-          Historial <History size={14} />
+          <History size={10} />
         </button>
       </div>
       
-      <div className="flex gap-4 overflow-x-auto pb-4 snap-x">
-        {LOGISTICS_OUT.map((job, idx) => (
-          <div key={job.id} className="min-w-[280px] snap-start">
-            <SmartTooltip 
-              text={`Envío a sucursal ${job.destination}`} 
-              position="top" 
-              className="w-full"
-            >
-              <motion.div 
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: idx * 0.1 }}
-                className="group flex flex-col bg-white/5 p-4 rounded-3xl border border-white/10 hover:bg-white/10 transition-all hover:border-brand-green/30 cursor-default gap-3"
-              >
-                <div className="flex items-center justify-between w-full gap-2">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="h-10 w-10 shrink-0 rounded-2xl bg-brand-green/20 flex items-center justify-center text-brand-green group-hover:scale-110 transition-transform">
-                      <Truck size={18} />
-                    </div>
-                    <div className="flex flex-col min-w-0">
-                      <span className="text-[10px] text-slate-500 font-mono tracking-widest uppercase font-black truncate">ORDEN</span>
-                      <span className="text-lg font-black text-brand-green tracking-tight truncate">{job.id.replace('#', '')}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="text-right flex flex-col shrink-0">
-                    <div className="flex flex-col items-end">
-                      <span className="text-[8px] text-slate-500 font-black uppercase tracking-widest mb-0.5 whitespace-nowrap">Sucursal</span>
-                      <span className="text-[10px] text-brand-green font-black uppercase tracking-widest px-2 py-0.5 bg-brand-green/10 rounded-md border border-brand-green/20 whitespace-nowrap">{job.destination}</span>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </SmartTooltip>
-          </div>
-        ))}
+      <div className="flex-1 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-white/10">
+        <div className="flex flex-col gap-1.5 py-1">
+          {LOGISTICS_OUT.map((job) => (
+            <div key={job.id} className="flex items-center gap-2 bg-white/5 p-1 rounded-lg border border-white/5">
+              <div className="w-7 h-7 bg-brand-green/20 rounded flex items-center justify-center shrink-0">
+                <Truck size={12} className="text-brand-green" />
+              </div>
+              <div className="flex-1 min-w-0">
+                 <div className="flex items-baseline justify-between">
+                   <span className="text-xs font-black text-brand-green leading-none">{job.id.replace('#', '')}</span>
+                   <span className="text-[6px] font-black text-brand-green uppercase tracking-tighter bg-brand-green/10 px-1 py-0.5 rounded border border-brand-green/20 truncate ml-2">
+                     {job.destination}
+                   </span>
+                 </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   </div>
@@ -579,185 +561,252 @@ export default function App() {
   return (
     <div className="min-h-screen pb-12 flex flex-col bg-slate-50">
       
-      <main className="flex-1 w-full px-4 pt-8 pb-12 space-y-8">
+      <main className="flex-1 w-full px-4 pt-0 pb-12">
         
-        {/* Top Section: Progress Cards and Logistics in the same line */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-x-12 gap-y-8 relative max-w-[1900px] mx-auto items-start">
+          {/* Artificial Vertical Divider for visual consistency */}
+          <div className="hidden xl:block absolute left-1/2 top-4 bottom-4 w-px bg-slate-200/50 -translate-x-1/2"></div>
           
-          {/* Tarjetas de Etapas (Laboratory Panel) */}
-          <section className="lg:col-span-8 flex flex-col">
-            <div className="flex items-center justify-between mb-4">
-              <div className="h-0.5 flex-1 bg-slate-100 hidden xl:block"></div>
-            </div>
-            
-            <div className="flex items-center gap-2 overflow-x-auto pb-4 pt-1 snap-x no-scrollbar">
-              {stats.map((stat: { stage: string; count: number; total: number }, idx: number) => (
-                <div key={stat.stage} className="snap-start flex-shrink-0">
-                  <SmartTooltip 
-                    text={`${stat.count} tareas en ${stat.stage}`}
-                    position="top"
-                  >
-                    <StageProgressCard 
-                      stage={stat.stage} 
-                      count={stat.count} 
-                      total={stat.total}
-                      isSelected={selectedStage === stat.stage || (stat.stage === 'General' && !selectedStage)}
-                      onClick={() => {
-                        if (stat.stage === 'General') {
-                          setSelectedStage(null);
-                        } else {
-                          setSelectedStage(selectedStage === stat.stage ? null : stat.stage as Stage);
+          {/* --- COLUMNA IZQUIERDA --- */}
+          <div className="space-y-8">
+            {/* Stage Icons (no container) */}
+            <section className="overflow-hidden">
+              <div className="flex items-center gap-2 overflow-x-auto pb-4 pt-1 snap-x scrollbar-thin scrollbar-thumb-slate-200">
+                {stats.map((stat: { stage: string; count: number; total: number }, idx: number) => (
+                  <div key={stat.stage} className="snap-start flex-shrink-0">
+                    <SmartTooltip 
+                      text={`${stat.count} tareas en ${stat.stage}`}
+                      position="top"
+                    >
+                      <StageProgressCard 
+                        stage={stat.stage} 
+                        count={stat.count} 
+                        total={stat.total}
+                        isSelected={selectedStage === stat.stage || (stat.stage === 'General' && !selectedStage)}
+                        onClick={() => {
+                          if (stat.stage === 'General') {
+                            setSelectedStage(null);
+                          } else {
+                            setSelectedStage(selectedStage === stat.stage ? null : stat.stage as Stage);
+                          }
+                        }}
+                        icon={getStageIcon(stat.stage as Stage)}
+                        colorClass={
+                          stat.stage === 'General' ? 'bg-brand-blue' :
+                          idx % 6 === 0 ? 'bg-blue-500' : 
+                          idx % 6 === 1 ? 'bg-indigo-500' : 
+                          idx % 6 === 2 ? 'bg-purple-500' : 
+                          idx % 6 === 3 ? 'bg-pink-500' : 
+                          idx % 6 === 4 ? 'bg-brand-green' : 'bg-brand-orange'
                         }
-                      }}
-                      icon={getStageIcon(stat.stage as Stage)}
-                      colorClass={
-                        stat.stage === 'General' ? 'bg-brand-blue' :
-                        idx % 6 === 0 ? 'bg-blue-500' : 
-                        idx % 6 === 1 ? 'bg-indigo-500' : 
-                        idx % 6 === 2 ? 'bg-purple-500' : 
-                        idx % 6 === 3 ? 'bg-pink-500' : 
-                        idx % 6 === 4 ? 'bg-brand-green' : 'bg-brand-orange'
-                      }
-                    />
-                  </SmartTooltip>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Panel de Logística (Salidas Recientes) */}
-          <section className="lg:col-span-4 flex flex-col justify-end">
-            <LogisticsOutSection onOpenHistory={() => setShowHistory(true)} />
-          </section>
-        </div>
-
-        {/* Breakdown Summary Section (Split into two panels) */}
-        <section className="mt-12 space-y-6">
-          <div className="flex flex-col md:flex-row justify-between items-end gap-6">
-            <div>
-              <h2 className="text-3xl font-black text-slate-900 tracking-tight uppercase italic flex items-center gap-3">
-                <ClipboardList size={32} className="text-brand-blue" />
-                Resumen de Órdenes
-              </h2>
-              <p className="text-slate-500 font-medium mt-1">Desglose detallado de todos los pedidos en curso.</p>
-            </div>
-
-            <div className="flex bg-white p-1 rounded-2xl border border-slate-200 shadow-sm overflow-x-auto max-w-full">
-              {(['Todas', 'Vencidas', 'Retrasado'] as const).map((f) => (
-                <button
-                  key={f}
-                  onClick={() => setFilter(f)}
-                  className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all whitespace-nowrap flex items-center justify-center gap-2 ${
-                    filter === f 
-                      ? (f === 'Vencidas' ? 'bg-brand-red text-white' : f === 'Retrasado' ? 'bg-brand-orange text-white' : 'bg-brand-blue text-white') + ' shadow-lg scale-105'
-                      : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
-                  }`}
-                >
-                  <span>{f}</span>
-                  {filterCounts[f] > 0 && (
-                    <span className={`flex items-center justify-center min-w-[18px] h-4.5 px-1 rounded-full text-[9px] font-black ${
-                      filter === f ? 'bg-white/20 text-white' :
-                      f === 'Vencidas' ? 'bg-brand-red text-white' : 
-                      f === 'Retrasado' ? 'bg-brand-orange text-white' : 
-                      'bg-slate-100 text-slate-500'
-                    }`}>
-                      {filterCounts[f]}
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-            {[0, 1].map((panelIdx) => {
-              const panelOrders = filteredOrders.filter((order) => {
-                const num = parseInt(order.id.replace('#', ''));
-                return isNaN(num) ? true : num % 2 === panelIdx;
-              });
-              
-              return (
-                <div key={panelIdx} className="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-slate-100 flex flex-col min-h-[500px]">
-                  <div className="bg-slate-50/50 px-8 py-4 border-b border-slate-100 flex justify-between items-center">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Panel {panelIdx + 1} • {panelOrders.length} Órdenes</span>
-                    <div className="flex gap-1">
-                      <div className="w-2 h-2 rounded-full bg-slate-200"></div>
-                      <div className="w-2 h-2 rounded-full bg-slate-200"></div>
-                    </div>
+                      />
+                    </SmartTooltip>
                   </div>
-                  
-                  <div className="flex-1">
-                    <table className="w-full text-left border-collapse">
-                      <thead>
-                        <tr className="hidden md:table-row">
-                          <th className="pl-8 pr-4 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest italic">ID</th>
-                          <th className="px-4 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest italic">Ubicación</th>
-                          <th className="px-4 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest italic text-center">T. Rest</th>
-                          <th className="pl-4 pr-8 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest italic text-right">Estado</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-50">
-                        <AnimatePresence initial={false}>
-                          {panelOrders.length > 0 ? (
-                            panelOrders.map((order) => (
-                              <motion.tr 
-                                key={order.id}
-                                initial={{ opacity: 0, y: 4 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -4 }}
-                                transition={{ duration: 0.15 }}
-                                className="hover:bg-slate-50/80 transition-colors group"
-                              >
-                                <td className="pl-8 pr-4 py-5">
-                                  <span className="text-xl font-black text-brand-blue tracking-tighter font-mono">#{order.id.replace('#', '')}</span>
-                                </td>
-                                <td className="px-4 py-5 group-hover:translate-x-1 transition-transform">
-                                  <div className="flex flex-col">
-                                    <span className="font-bold text-slate-800 text-sm leading-tight">{order.location}</span>
-                                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-tight truncate max-w-[120px]">{order.stage}</span>
-                                  </div>
-                                </td>
-                                <td className="px-4 py-5 text-center">
-                                  <span className={`text-lg font-black tabular-nums ${
-                                    order.remainingTime <= 0 ? 'text-brand-red animate-pulse' : 
-                                    order.remainingTime <= 60 ? 'text-brand-orange' : 'text-brand-green'
-                                  }`}>
-                                    {order.remainingTime}<span className="text-[10px] ml-0.5">'</span>
-                                  </span>
-                                </td>
-                                <td className="pl-4 pr-8 py-5 text-right">
-                                  <span className={`text-[8px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest shadow-sm inline-block whitespace-nowrap ${getStatusColor(order.status)}`}>
-                                    {order.status}
-                                  </span>
-                                </td>
-                              </motion.tr>
-                            ))
-                          ) : (
-                            <motion.tr
-                              key={`empty-${panelIdx}-${filter}`}
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              exit={{ opacity: 0 }}
+                ))}
+              </div>
+            </section>
+
+            {/* Breakdown Summary Section (Panel 1) */}
+            <section className="space-y-6">
+              <div className="flex flex-col gap-1">
+                <h2 className="text-3xl font-black text-slate-900 tracking-tight uppercase italic flex items-center gap-3">
+                  <ClipboardList size={32} className="text-brand-blue" />
+                  Resumen de Órdenes
+                </h2>
+                <p className="text-slate-500 font-medium italic text-xs">Desglose detallado de todos los pedidos en curso.</p>
+              </div>
+
+              <div className="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-slate-100 flex flex-col min-h-[500px]">
+                <div className="bg-slate-50/50 px-8 py-4 border-b border-slate-100 flex justify-between items-center">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Panel 1 • {filteredOrders.filter((_, i) => i % 2 === 0).length} Órdenes</span>
+                  <div className="flex gap-1">
+                    <div className="w-2 h-2 rounded-full bg-slate-200"></div>
+                    <div className="w-2 h-2 rounded-full bg-slate-200"></div>
+                  </div>
+                </div>
+                
+                <div className="flex-1">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="hidden md:table-row">
+                        <th className="pl-8 pr-4 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest italic">ID</th>
+                        <th className="px-4 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest italic">Ubicación</th>
+                        <th className="px-4 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest italic text-center">T. Rest</th>
+                        <th className="pl-4 pr-8 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest italic text-right">Estado</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50">
+                      <AnimatePresence initial={false}>
+                        {filteredOrders.filter((_, i) => i % 2 === 0).length > 0 ? (
+                          filteredOrders.filter((_, i) => i % 2 === 0).map((order) => (
+                            <motion.tr 
+                              key={order.id}
+                              initial={{ opacity: 0, y: 4 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -4 }}
+                              transition={{ duration: 0.15 }}
+                              className="hover:bg-slate-50/80 transition-colors group"
                             >
-                              <td colSpan={4} className="py-24 text-center">
-                                <div className="flex flex-col items-center gap-3 opacity-20">
-                                  <Box size={40} className="text-slate-400" />
-                                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">
-                                    {panelIdx === 0 && filteredOrders.length === 0 ? 'Sin registros' : 'Panel vacío'}
-                                  </p>
+                              <td className="pl-8 pr-4 py-5">
+                                <span className="text-xl font-black text-brand-blue tracking-tighter font-mono">{order.id.replace('#', '')}</span>
+                              </td>
+                              <td className="px-4 py-5 group-hover:translate-x-1 transition-transform">
+                                <div className="flex flex-col">
+                                  <span className="font-bold text-slate-800 text-sm leading-tight">{order.location}</span>
+                                  <span className="text-[9px] text-slate-400 font-bold uppercase tracking-tight truncate max-w-[120px]">{order.stage}</span>
                                 </div>
                               </td>
+                              <td className="px-4 py-5 text-center">
+                                <span className={`text-lg font-black tabular-nums ${
+                                  order.remainingTime <= 0 ? 'text-brand-red animate-pulse' : 
+                                  order.remainingTime <= 60 ? 'text-brand-orange' : 'text-brand-green'
+                                }`}>
+                                  {order.remainingTime}<span className="text-[10px] ml-0.5">'</span>
+                                </span>
+                              </td>
+                              <td className="pl-4 pr-8 py-5 text-right">
+                                <span className={`text-[8px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest shadow-sm inline-block whitespace-nowrap ${getStatusColor(order.status)}`}>
+                                  {order.status}
+                                </span>
+                              </td>
                             </motion.tr>
-                          )}
-                        </AnimatePresence>
-                      </tbody>
-                    </table>
+                          ))
+                        ) : (
+                          <motion.tr
+                            key={`empty-0-${filter}`}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                          >
+                            <td colSpan={4} className="py-24 text-center">
+                              <div className="flex flex-col items-center gap-3 opacity-20">
+                                <Box size={40} className="text-slate-400" />
+                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic font-bold">Panel vacío</p>
+                              </div>
+                            </td>
+                          </motion.tr>
+                        )}
+                      </AnimatePresence>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          {/* --- COLUMNA DERECHA --- */}
+          <div className="space-y-8">
+            {/* Panel de Logística (Salidas Recientes) */}
+            <LogisticsOutSection onOpenHistory={() => setShowHistory(true)} />
+
+            {/* Panel 2 (Filtros y Tabla) */}
+            <section className="space-y-6 flex flex-col h-full overflow-hidden">
+              <div className="flex justify-end pt-2">
+                <div className="flex bg-white p-1 rounded-2xl border border-slate-200 shadow-sm overflow-x-auto max-w-full">
+                  {(['Todas', 'Vencidas', 'Retrasado'] as const).map((f) => (
+                    <button
+                      key={f}
+                      onClick={() => setFilter(f)}
+                      className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all whitespace-nowrap flex items-center justify-center gap-2 ${
+                        filter === f 
+                          ? (f === 'Vencidas' ? 'bg-brand-red text-white' : f === 'Retrasado' ? 'bg-brand-orange text-white' : 'bg-brand-blue text-white') + ' shadow-lg scale-105'
+                          : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
+                      }`}
+                    >
+                      <span>{f}</span>
+                      {filterCounts[f] > 0 && (
+                        <span className={`flex items-center justify-center min-w-[18px] h-4.5 px-1 rounded-full text-[9px] font-black ${
+                          filter === f ? 'bg-white/20 text-white' :
+                          f === 'Vencidas' ? 'bg-brand-red text-white' : 
+                          f === 'Retrasado' ? 'bg-brand-orange text-white' : 
+                          'bg-slate-100 text-slate-500'
+                        }`}>
+                          {filterCounts[f]}
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-slate-100 flex flex-col min-h-[500px]">
+                <div className="bg-slate-50/50 px-8 py-4 border-b border-slate-100 flex justify-between items-center">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Panel 2 • {filteredOrders.filter((_, i) => i % 2 !== 0).length} Órdenes</span>
+                  <div className="flex gap-1">
+                    <div className="w-2 h-2 rounded-full bg-slate-200"></div>
+                    <div className="w-2 h-2 rounded-full bg-slate-200"></div>
                   </div>
                 </div>
-              );
-            })}
+                
+                <div className="flex-1">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="hidden md:table-row">
+                        <th className="pl-8 pr-4 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest italic">ID</th>
+                        <th className="px-4 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest italic">Ubicación</th>
+                        <th className="px-4 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest italic text-center">T. Rest</th>
+                        <th className="pl-4 pr-8 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest italic text-right">Estado</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50">
+                      <AnimatePresence initial={false}>
+                        {filteredOrders.filter((_, i) => i % 2 !== 0).length > 0 ? (
+                          filteredOrders.filter((_, i) => i % 2 !== 0).map((order) => (
+                            <motion.tr 
+                              key={order.id}
+                              initial={{ opacity: 0, y: 4 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -4 }}
+                              transition={{ duration: 0.15 }}
+                              className="hover:bg-slate-50/80 transition-colors group"
+                            >
+                              <td className="pl-8 pr-4 py-5">
+                                <span className="text-xl font-black text-brand-blue tracking-tighter font-mono">{order.id.replace('#', '')}</span>
+                              </td>
+                              <td className="px-4 py-5 group-hover:translate-x-1 transition-transform">
+                                <div className="flex flex-col">
+                                  <span className="font-bold text-slate-800 text-sm leading-tight">{order.location}</span>
+                                  <span className="text-[9px] text-slate-400 font-bold uppercase tracking-tight truncate max-w-[120px]">{order.stage}</span>
+                                </div>
+                              </td>
+                              <td className="px-4 py-5 text-center">
+                                <span className={`text-lg font-black tabular-nums ${
+                                  order.remainingTime <= 0 ? 'text-brand-red animate-pulse' : 
+                                  order.remainingTime <= 60 ? 'text-brand-orange' : 'text-brand-green'
+                                }`}>
+                                  {order.remainingTime}<span className="text-[10px] ml-0.5">'</span>
+                                </span>
+                              </td>
+                              <td className="pl-4 pr-8 py-5 text-right">
+                                <span className={`text-[8px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest shadow-sm inline-block whitespace-nowrap ${getStatusColor(order.status)}`}>
+                                  {order.status}
+                                </span>
+                              </td>
+                            </motion.tr>
+                          ))
+                        ) : (
+                          <motion.tr
+                            key={`empty-1-${filter}`}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                          >
+                            <td colSpan={4} className="py-24 text-center">
+                              <div className="flex flex-col items-center gap-3 opacity-20">
+                                <Box size={40} className="text-slate-400" />
+                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic font-bold">Panel vacío</p>
+                              </div>
+                            </td>
+                          </motion.tr>
+                        )}
+                      </AnimatePresence>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </section>
           </div>
-        </section>
+        </div>
 
       </main>
 
