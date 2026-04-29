@@ -736,7 +736,7 @@ export default function App() {
                                 className="hover:bg-slate-50/80 transition-colors group"
                               >
                                 <td className="pl-8 pr-4 py-5">
-                                  <span className="text-base font-black text-brand-blue tracking-tighter font-mono">#{order.id.replace('#', '')}</span>
+                                  <span className="text-xl font-black text-brand-blue tracking-tighter font-mono">#{order.id.replace('#', '')}</span>
                                 </td>
                                 <td className="px-4 py-5 group-hover:translate-x-1 transition-transform">
                                   <div className="flex flex-col">
