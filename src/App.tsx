@@ -200,7 +200,7 @@ const MonitorView: React.FC<{
             <ClipboardList size={22} className="md:w-8 md:h-8" />
           </div>
           <div className="min-w-0 flex-1">
-            <h1 className="text-lg md:text-4xl font-black text-white tracking-tight uppercase italic leading-tight truncate">Monitor Central de Órdenes</h1>
+            <h1 className="text-lg md:text-4xl font-black text-white tracking-tight uppercase italic leading-tight truncate">Sistema de Gestión</h1>
             <div className="flex flex-wrap items-center gap-2 md:gap-3 mt-1.5 md:mt-2">
               <div className="flex items-center gap-1.5 bg-brand-green/20 px-2 py-0.5 rounded-full border border-brand-green/30 shrink-0">
                 <div className="h-1.5 w-1.5 rounded-full bg-brand-green animate-pulse"></div>
@@ -374,19 +374,21 @@ const RealTimeClock: React.FC = () => {
   );
 };
 
-const Header: React.FC = () => (
-  <header className="flex flex-col md:flex-row justify-between items-center bg-brand-blue p-6 shadow-lg rounded-b-3xl">
+const Header: React.FC<{ totalOrders: number }> = ({ totalOrders }) => (
+  <header className="flex flex-col md:flex-row justify-between items-center bg-brand-blue p-5 shadow-lg rounded-b-3xl">
     <div className="flex flex-col items-center md:items-start mb-4 md:mb-0">
-      <div>
-        <h1 className="text-2xl font-bold text-white tracking-tight text-center md:text-left">Panel de Control de Laboratorio Óptico</h1>
-        <p className="text-brand-green font-medium text-sm flex items-center justify-center md:justify-start gap-1 uppercase tracking-wider">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-          </span>
-          Sistema de Gestión Beta
-        </p>
+      <div className="flex items-center gap-4">
+        <h1 className="text-xl md:text-2xl font-black text-white tracking-tighter text-center md:text-left uppercase italic">Sistema de Gestión</h1>
+        <div className="bg-white/10 px-3 py-1 rounded-full border border-white/10 flex items-center gap-2">
+          <div className="h-2 w-2 rounded-full bg-brand-green animate-pulse"></div>
+          <span className="text-[10px] font-black text-white uppercase tracking-widest leading-none">{totalOrders} Tareas</span>
+        </div>
       </div>
+      <p className="text-brand-green/80 font-bold text-[9px] uppercase tracking-[0.2em] mt-1 flex items-center gap-2">
+        <span>Solmar Óptica</span>
+        <span className="h-1 w-1 rounded-full bg-white/20"></span>
+        <span>Panel de Control</span>
+      </p>
     </div>
     <RealTimeClock />
   </header>
@@ -596,28 +598,31 @@ export default function App() {
 
   return (
     <div className="min-h-screen pb-12 flex flex-col bg-slate-50">
-      <Header />
+      <Header totalOrders={orders.length} />
       
       <main className="flex-1 w-full px-4 mt-6 space-y-8">
         
-        {/* Top Section: Progress Cards and Logistics in horizontal strips */}
-        <div className="space-y-8">
+        {/* Top Section: Progress Cards and Logistics in the same line */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
           
-          {/* Tarjetas de Etapas (Laboratory Panel - Horizontal Scroll) */}
-          <section>
+          {/* Tarjetas de Etapas (Laboratory Panel) */}
+          <section className="lg:col-span-8 flex flex-col">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-black flex items-center gap-2 uppercase tracking-tighter italic text-slate-800">
-                <Layers size={21} className="text-brand-blue" />
-                <span>Estado de Laboratorio</span>
-              </h3>
-              <div className="text-[9px] font-black bg-brand-blue/10 text-brand-blue px-3 py-1 rounded-full uppercase tracking-widest border border-brand-blue/20">
-                {stats.length} Procesos
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-black uppercase tracking-tighter italic text-slate-800 flex items-center gap-2">
+                  <Layers size={18} className="text-brand-blue" />
+                  Estado de Laboratorio
+                </h3>
+                <span className="text-[10px] font-bold bg-brand-blue/10 text-brand-blue px-2 py-0.5 rounded-full uppercase tracking-widest border border-brand-blue/20">
+                  {stats.length} Procesos
+                </span>
               </div>
+              <div className="h-0.5 flex-1 mx-4 bg-slate-100 hidden xl:block"></div>
             </div>
             
-            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x">
               {stats.map((stat: { stage: string; count: number; total: number }, idx: number) => (
-                <div key={stat.stage} className="min-w-[280px] md:min-w-[320px] snap-start">
+                <div key={stat.stage} className="min-w-[180px] md:min-w-[220px] snap-start">
                   <SmartTooltip 
                     text={`Pedidos esperando en ${stat.stage}`}
                     position="bottom"
@@ -650,11 +655,9 @@ export default function App() {
             </div>
           </section>
 
-          {/* Panel de Logística (Salidas Recientes - Compacto) */}
-          <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-            <div className="lg:col-span-12">
-               <LogisticsOutSection onOpenHistory={() => setShowHistory(true)} />
-            </div>
+          {/* Panel de Logística (Salidas Recientes) */}
+          <section className="lg:col-span-4 flex flex-col justify-end">
+            <LogisticsOutSection onOpenHistory={() => setShowHistory(true)} />
           </section>
         </div>
 
