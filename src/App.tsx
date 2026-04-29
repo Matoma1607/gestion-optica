@@ -200,8 +200,7 @@ const MonitorView: React.FC<{
             <ClipboardList size={22} className="md:w-8 md:h-8" />
           </div>
           <div className="min-w-0 flex-1">
-            <h1 className="text-lg md:text-4xl font-black text-white tracking-tight uppercase italic leading-tight truncate">Sistema de Gestión</h1>
-            <div className="flex flex-wrap items-center gap-2 md:gap-3 mt-1.5 md:mt-2">
+            <div className="flex flex-wrap items-center gap-2 md:gap-3">
               <div className="flex items-center gap-1.5 bg-brand-green/20 px-2 py-0.5 rounded-full border border-brand-green/30 shrink-0">
                 <div className="h-1.5 w-1.5 rounded-full bg-brand-green animate-pulse"></div>
                 <span className="text-brand-green text-[9px] md:text-[10px] font-black uppercase tracking-widest leading-none">ACTIVO</span>
@@ -587,16 +586,7 @@ export default function App() {
           {/* Tarjetas de Etapas (Laboratory Panel) */}
           <section className="lg:col-span-8 flex flex-col">
             <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <h3 className="text-lg font-black uppercase tracking-tighter italic text-slate-800 flex items-center gap-2">
-                  <Layers size={18} className="text-brand-blue" />
-                  Estado de Laboratorio
-                </h3>
-                <span className="text-[10px] font-bold bg-brand-blue/10 text-brand-blue px-2 py-0.5 rounded-full uppercase tracking-widest border border-brand-blue/20">
-                  {stats.length} Procesos
-                </span>
-              </div>
-              <div className="h-0.5 flex-1 mx-4 bg-slate-100 hidden xl:block"></div>
+              <div className="h-0.5 flex-1 bg-slate-100 hidden xl:block"></div>
             </div>
             
             <div className="flex gap-3 overflow-x-auto pb-4 snap-x">
