@@ -105,6 +105,18 @@ const INITIAL_ORDERS: Order[] = [
   { id: '#10812', location: 'Solmar Alem', promisedTime: '11:15', stage: 'Opticenter', remainingTime: -120, status: 'Vencida' },
   { id: '#10915', location: 'Yerba Buena', promisedTime: '16:45', stage: 'Solmar 2', remainingTime: 35, status: 'Retrasado' },
   { id: '#10999', location: 'Lutz Ferrando', promisedTime: '15:20', stage: 'Lutz Ferrand', remainingTime: 25, status: 'Retrasado' },
+  { id: '#11022', location: 'Solmar Mendoza', promisedTime: '14:00', stage: 'Cristales', remainingTime: -15, status: 'Vencida' },
+  { id: '#11045', location: 'Lutz Ferrando', promisedTime: '16:30', stage: 'Calibrado', remainingTime: 45, status: 'Retrasado' },
+  { id: '#11056', location: 'Junín', promisedTime: '18:00', stage: 'Antireflejo', remainingTime: 120, status: 'A tiempo' },
+  { id: '#11078', location: 'Maipú', promisedTime: '13:00', stage: 'Superficie', remainingTime: -30, status: 'Vencida' },
+  { id: '#11102', location: 'Concepción', promisedTime: '17:15', stage: 'Yerba Buena', remainingTime: 60, status: 'A tiempo' },
+  { id: '#11134', location: 'Solmar Alem', promisedTime: '15:00', stage: 'Calibrado', remainingTime: 10, status: 'Retrasado' },
+  { id: '#11156', location: '24 de Septiembre', promisedTime: '19:00', stage: 'Armazones', remainingTime: 180, status: 'A tiempo' },
+  { id: '#11189', location: 'Aguilares', promisedTime: '14:45', stage: 'Calibrado', remainingTime: 15, status: 'Retrasado' },
+  { id: '#11210', location: '9 de Julio', promisedTime: '16:15', stage: 'Cristales', remainingTime: 50, status: 'A tiempo' },
+  { id: '#11245', location: 'Solmar Mendoza', promisedTime: '12:45', stage: 'Logística', remainingTime: -60, status: 'Vencida' },
+  { id: '#11301', location: 'Lutz Ferrando', promisedTime: '17:30', stage: 'Calibrado', remainingTime: 105, status: 'A tiempo' },
+  { id: '#11342', location: 'Yerba Buena', promisedTime: '16:00', stage: 'Antireflejo', remainingTime: 15, status: 'Retrasado' },
 ];
 
 const LOGISTICS_OUT: { id: string; destination: string; exitTime: string; items: string[] }[] = [
@@ -112,6 +124,9 @@ const LOGISTICS_OUT: { id: string; destination: string; exitTime: string; items:
   { id: '#10112', destination: 'Yerba Buena', exitTime: '03:55 p. m.', items: ['Orgánico Blanco', 'Reparación Patilla'] },
   { id: '#10166', destination: 'Aguilares', exitTime: '03:55 p. m.', items: ['Policarbonato AR', 'Estuche Rígido'] },
   { id: '#10385', destination: 'Solmar Alem', exitTime: '04:00 p. m.', items: ['Lente de Contacto', 'Líquido Limpieza'] },
+  { id: '#11022', destination: 'Solmar Mendoza', exitTime: '02:00 p. m.', items: ['Cristal Mineral', 'Armazón Metal'] },
+  { id: '#11245', destination: 'Lutz Ferrando', exitTime: '04:30 p. m.', items: ['Lente Contacto Color', 'Solución Limpieza'] },
+  { id: '#11300', destination: 'Concepción', exitTime: '05:00 p. m.', items: ['Multifocal Varilux', 'Limpieza Ultrasonido'] },
 ];
 
 const SmartTooltip: React.FC<{ text: string; children: React.ReactNode; position?: 'top' | 'bottom' | 'side'; className?: string }> = ({ text, children, position = 'top', className = '' }) => {
@@ -682,9 +697,14 @@ export default function App() {
 
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
             {[0, 1].map((panelIdx) => {
-              const panelOrders = filteredOrders.filter((_, i) => i % 2 === panelIdx);
+              // Distribución estable basada en el ID para evitar saltos entre paneles al filtrar
+              const panelOrders = filteredOrders.filter((order) => {
+                const num = parseInt(order.id.replace('#', ''));
+                return isNaN(num) ? true : num % 2 === panelIdx;
+              });
+              
               return (
-                <div key={panelIdx} className="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-slate-100">
+                <div key={panelIdx} className="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-slate-100 min-h-[300px]">
                   <div className="overflow-x-auto w-full">
                     <table className="w-full text-left border-collapse min-w-[400px]">
                       <thead>
@@ -696,44 +716,45 @@ export default function App() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-50">
-                        <AnimatePresence mode="popLayout" initial={false}>
+                        <AnimatePresence initial={false} mode="wait">
                           {panelOrders.length > 0 ? (
-                            panelOrders.map((order, idx) => (
-                              <motion.tr 
-                                key={order.id}
-                                layout
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, scale: 0.98 }}
-                                transition={{ duration: 0.2, delay: Math.min(idx * 0.02, 0.2) }}
-                                className="hover:bg-slate-50/80 transition-colors group"
-                              >
-                                <td className="px-6 py-6">
-                                  <span className="text-lg font-black text-brand-blue tracking-tight font-mono">#{order.id.replace('#', '')}</span>
-                                </td>
-                                <td className="px-6 py-6 font-bold text-slate-800 text-sm">
-                                  {order.location}
-                                </td>
-                                <td className="px-6 py-6 text-center">
-                                  <span className={`text-xl font-black ${
-                                    order.remainingTime <= 0 ? 'text-brand-red animate-pulse' : 
-                                    order.remainingTime <= 60 ? 'text-brand-orange' : 'text-brand-green'
-                                  }`}>
-                                    {order.remainingTime}'
-                                  </span>
-                                </td>
-                                <td className="px-6 py-6 text-right">
-                                  <span className={`text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest shadow-sm inline-block ${getStatusColor(order.status)}`}>
-                                    {order.status}
-                                  </span>
-                                </td>
-                              </motion.tr>
-                            ))
+                            <motion.g
+                              key={`${panelIdx}-${filter}-${selectedStage}`}
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              transition={{ duration: 0.15 }}
+                            >
+                              {panelOrders.map((order) => (
+                                <tr key={order.id} className="hover:bg-slate-50/80 transition-colors group">
+                                  <td className="px-6 py-6">
+                                    <span className="text-lg font-black text-brand-blue tracking-tight font-mono">#{order.id.replace('#', '')}</span>
+                                  </td>
+                                  <td className="px-6 py-6 font-bold text-slate-800 text-sm">
+                                    {order.location}
+                                  </td>
+                                  <td className="px-6 py-6 text-center">
+                                    <span className={`text-xl font-black ${
+                                      order.remainingTime <= 0 ? 'text-brand-red animate-pulse' : 
+                                      order.remainingTime <= 60 ? 'text-brand-orange' : 'text-brand-green'
+                                    }`}>
+                                      {order.remainingTime}'
+                                    </span>
+                                  </td>
+                                  <td className="px-6 py-6 text-right">
+                                    <span className={`text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest shadow-sm inline-block ${getStatusColor(order.status)}`}>
+                                      {order.status}
+                                    </span>
+                                  </td>
+                                </tr>
+                              ))}
+                            </motion.g>
                           ) : (
                             <motion.tr
                               key={`empty-${panelIdx}`}
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
                             >
                               <td colSpan={4} className="py-20 text-center">
                                 <p className="text-xs font-black uppercase tracking-widest text-slate-300 italic">
