@@ -374,26 +374,6 @@ const RealTimeClock: React.FC = () => {
   );
 };
 
-const Header: React.FC<{ totalOrders: number }> = ({ totalOrders }) => (
-  <header className="flex flex-col md:flex-row justify-between items-center bg-brand-blue p-5 shadow-lg rounded-b-3xl">
-    <div className="flex flex-col items-center md:items-start mb-4 md:mb-0">
-      <div className="flex items-center gap-4">
-        <h1 className="text-xl md:text-2xl font-black text-white tracking-tighter text-center md:text-left uppercase italic">Sistema de Gestión</h1>
-        <div className="bg-white/10 px-3 py-1 rounded-full border border-white/10 flex items-center gap-2">
-          <div className="h-2 w-2 rounded-full bg-brand-green animate-pulse"></div>
-          <span className="text-[10px] font-black text-white uppercase tracking-widest leading-none">{totalOrders} Tareas</span>
-        </div>
-      </div>
-      <p className="text-brand-green/80 font-bold text-[9px] uppercase tracking-[0.2em] mt-1 flex items-center gap-2">
-        <span>Solmar Óptica</span>
-        <span className="h-1 w-1 rounded-full bg-white/20"></span>
-        <span>Panel de Control</span>
-      </p>
-    </div>
-    <RealTimeClock />
-  </header>
-);
-
 interface StageProgressCardProps {
   key?: React.Key;
   stage: string;
@@ -598,9 +578,8 @@ export default function App() {
 
   return (
     <div className="min-h-screen pb-12 flex flex-col bg-slate-50">
-      <Header totalOrders={orders.length} />
       
-      <main className="flex-1 w-full px-4 mt-6 space-y-8">
+      <main className="flex-1 w-full px-4 pt-8 pb-12 space-y-8">
         
         {/* Top Section: Progress Cards and Logistics in the same line */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
