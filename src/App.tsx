@@ -118,6 +118,18 @@ const INITIAL_ORDERS: Order[] = [
   { id: '#11245', location: 'Solmar Mendoza', promisedTime: '12:45', stage: 'Logística', remainingTime: -60, status: 'Vencida' },
   { id: '#11301', location: 'Lutz Ferrando', promisedTime: '17:30', stage: 'Calibrado', remainingTime: 105, status: 'A tiempo' },
   { id: '#11342', location: 'Yerba Buena', promisedTime: '16:00', stage: 'Antireflejo', remainingTime: 15, status: 'Retrasado' },
+  { id: '#11400', location: 'Maipú', promisedTime: '10:00', stage: 'Calibrado', remainingTime: -120, status: 'Vencida' },
+  { id: '#11401', location: '24 de Septiembre', promisedTime: '10:15', stage: 'Superficie', remainingTime: 45, status: 'A tiempo' },
+  { id: '#11402', location: '9 de Julio', promisedTime: '10:30', stage: 'Cristales', remainingTime: 15, status: 'Retrasado' },
+  { id: '#11403', location: 'Aguilares', promisedTime: '10:45', stage: 'Antireflejo', remainingTime: 120, status: 'A tiempo' },
+  { id: '#11404', location: 'Solmar Alem', promisedTime: '11:00', stage: 'Logística', remainingTime: 30, status: 'Retrasado' },
+  { id: '#11405', location: 'Solmar Mendoza', promisedTime: '11:15', stage: 'Calibrado', remainingTime: 60, status: 'A tiempo' },
+  { id: '#11406', location: 'Junín', promisedTime: '11:30', stage: 'Superficie', remainingTime: -10, status: 'Vencida' },
+  { id: '#11407', location: 'Lutz Ferrando', promisedTime: '11:45', stage: 'Cristales', remainingTime: 20, status: 'Retrasado' },
+  { id: '#11408', location: 'Maipú', promisedTime: '12:00', stage: 'Antireflejo', remainingTime: 90, status: 'A tiempo' },
+  { id: '#11409', location: 'Yerba Buena', promisedTime: '12:15', stage: 'Logística', remainingTime: 15, status: 'Retrasado' },
+  { id: '#11410', location: 'Concepción', promisedTime: '12:30', stage: 'Calibrado', remainingTime: 180, status: 'A tiempo' },
+  { id: '#11411', location: '24 de Septiembre', promisedTime: '12:45', stage: 'Superficie', remainingTime: -45, status: 'Vencida' },
 ];
 
 const LOGISTICS_OUT: { id: string; destination: string; exitTime: string; items: string[] }[] = [
@@ -483,20 +495,20 @@ const CompactOrderCard: React.FC<{ order: Order }> = ({ order }) => {
     <motion.div 
       initial={{ opacity: 0, y: 5 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white border border-slate-100 rounded-xl p-2 shadow-none hover:bg-slate-50 transition-all group relative overflow-hidden"
+      className="bg-white border border-slate-100 rounded-xl p-1.5 shadow-none hover:bg-slate-50 transition-all group relative overflow-hidden"
     >
-      <div className="flex items-center justify-between mb-1">
+      <div className="flex items-center justify-between mb-0.5">
         <span className="text-sm font-black text-brand-blue font-mono tracking-tighter">
           {order.id.replace('#', '')}
         </span>
-        <span className={`text-[7px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter shadow-sm border ${getStatusColor(order.status)}`}>
+        <span className={`text-[7px] font-black px-1 py-0.5 rounded uppercase tracking-tighter shadow-sm border ${getStatusColor(order.status)}`}>
           {order.status}
         </span>
       </div>
       
-      <div className="flex items-end justify-between gap-2">
+      <div className="flex items-end justify-between gap-1">
         <div className="flex flex-col min-w-0">
-          <span className="text-[10px] font-bold text-slate-800 leading-none truncate mb-0.5">{order.location}</span>
+          <span className="text-[10px] font-bold text-slate-800 leading-none truncate">{order.location}</span>
           <span className="text-[8px] text-slate-400 font-bold uppercase tracking-tighter truncate">{order.stage}</span>
         </div>
         
@@ -658,18 +670,18 @@ export default function App() {
             <div className="hidden xl:block absolute left-1/2 top-4 bottom-4 w-px bg-slate-200/50 -translate-x-1/2"></div>
             
             {/* Panel 1 */}
-            <section className="space-y-6">
+            <section className="space-y-4">
               <div className="bg-white rounded-[2.5rem] shadow-none overflow-hidden border border-slate-200/60 flex flex-col min-h-[500px]">
-                <div className="flex-1 p-6 overflow-y-auto max-h-[750px] scrollbar-thin scrollbar-thumb-slate-200">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex-1 p-4 overflow-y-auto max-h-[1400px] scrollbar-thin scrollbar-thumb-slate-200">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {/* Sub-Panel 1A */}
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {filteredOrders.filter((_, i) => i % 4 === 0).map((order) => (
                         <CompactOrderCard key={order.id} order={order} />
                       ))}
                     </div>
                     {/* Sub-Panel 1B */}
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {filteredOrders.filter((_, i) => i % 4 === 1).map((order) => (
                         <CompactOrderCard key={order.id} order={order} />
                       ))}
@@ -686,18 +698,18 @@ export default function App() {
             </section>
 
             {/* Panel 2 */}
-            <section className="space-y-6 flex flex-col h-full overflow-hidden">
+            <section className="space-y-4 flex flex-col h-full overflow-hidden">
               <div className="bg-white rounded-[2.5rem] shadow-none overflow-hidden border border-slate-200/60 flex flex-col min-h-[500px]">
-                <div className="flex-1 p-6 overflow-y-auto max-h-[750px] scrollbar-thin scrollbar-thumb-slate-200">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex-1 p-4 overflow-y-auto max-h-[1400px] scrollbar-thin scrollbar-thumb-slate-200">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {/* Sub-Panel 2A */}
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {filteredOrders.filter((_, i) => i % 4 === 2).map((order) => (
                         <CompactOrderCard key={order.id} order={order} />
                       ))}
                     </div>
                     {/* Sub-Panel 2B */}
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {filteredOrders.filter((_, i) => i % 4 === 3).map((order) => (
                         <CompactOrderCard key={order.id} order={order} />
                       ))}
