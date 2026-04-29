@@ -427,7 +427,7 @@ function StageProgressCard({ stage, count, colorClass, icon: Icon, isSelected, o
 }
 
 const LogisticsOutSection: React.FC<{ onOpenHistory: () => void }> = ({ onOpenHistory }) => (
-  <div className="bg-slate-900 text-white p-2 rounded-2xl shadow-xl border border-white/5 relative overflow-hidden h-[68px] flex flex-col shrink-0">
+  <div className="bg-slate-900 text-white p-2 rounded-2xl shadow-xl border border-white/5 relative overflow-hidden h-[60px] flex flex-col shrink-0">
     <div className="absolute top-0 right-0 w-16 h-16 bg-brand-green/10 blur-xl rounded-full -mr-4 -mt-4"></div>
     <div className="relative z-10 flex flex-col h-full justify-between">
       <div className="flex items-center justify-between">
@@ -469,6 +469,50 @@ const LogisticsOutSection: React.FC<{ onOpenHistory: () => void }> = ({ onOpenHi
     </div>
   </div>
 );
+
+const CompactOrderCard: React.FC<{ order: Order }> = ({ order }) => {
+  const getStatusColor = (status: Status) => {
+    switch (status) {
+      case 'Vencida': return 'bg-brand-red text-white border-brand-red/20 shadow-brand-red/10';
+      case 'Retrasado': return 'bg-brand-orange text-white border-brand-orange/20 shadow-brand-orange/10';
+      default: return 'bg-brand-green text-white border-brand-green/20 shadow-brand-green/10';
+    }
+  };
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 5 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-white border border-slate-100 rounded-xl p-2 shadow-none hover:bg-slate-50 transition-all group relative overflow-hidden"
+    >
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-sm font-black text-brand-blue font-mono tracking-tighter">
+          {order.id.replace('#', '')}
+        </span>
+        <span className={`text-[7px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter shadow-sm border ${getStatusColor(order.status)}`}>
+          {order.status}
+        </span>
+      </div>
+      
+      <div className="flex items-end justify-between gap-2">
+        <div className="flex flex-col min-w-0">
+          <span className="text-[10px] font-bold text-slate-800 leading-none truncate mb-0.5">{order.location}</span>
+          <span className="text-[8px] text-slate-400 font-bold uppercase tracking-tighter truncate">{order.stage}</span>
+        </div>
+        
+        <div className="flex items-baseline gap-0.5 text-right shrink-0">
+          <span className={`text-sm font-black italic tabular-nums ${
+            order.remainingTime <= 0 ? 'text-brand-red' : 
+            order.remainingTime <= 60 ? 'text-brand-orange' : 'text-brand-green'
+          }`}>
+            {order.remainingTime}
+          </span>
+          <span className="text-[8px] font-bold text-slate-300 italic">'</span>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
 
 // --- Main App Component ---
 
@@ -566,16 +610,11 @@ export default function App() {
     <div className="min-h-screen pb-12 flex flex-col bg-slate-50">
       
       <main className="flex-1 w-full px-4 pt-4 pb-12">
-        
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-x-12 gap-y-8 relative max-w-[1900px] mx-auto items-start">
-          {/* Artificial Vertical Divider for visual consistency */}
-          <div className="hidden xl:block absolute left-1/2 top-4 bottom-4 w-px bg-slate-200/50 -translate-x-1/2"></div>
-          
-          {/* --- COLUMNA IZQUIERDA --- */}
-          <div className="space-y-8">
-            {/* Stage Icons (no container) */}
+        <div className="max-w-[1900px] mx-auto space-y-8">
+          {/* Top Section: Navigation & Logistics */}
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-x-12 items-center">
             <section className="overflow-hidden">
-              <div className="flex items-center gap-2 overflow-x-auto pb-4 pt-1 snap-x scrollbar-thin scrollbar-thumb-slate-200">
+              <div className="flex items-center gap-2 overflow-x-auto pt-1 snap-x scrollbar-thin scrollbar-thumb-slate-200 uppercase tracking-widest">
                 {stats.map((stat: { stage: string; count: number; total: number }, idx: number) => (
                   <div key={stat.stage} className="snap-start flex-shrink-0">
                     <SmartTooltip 
@@ -610,172 +649,71 @@ export default function App() {
               </div>
             </section>
 
-            {/* Breakdown Summary Section (Panel 1) */}
+            <LogisticsOutSection onOpenHistory={() => setShowHistory(true)} />
+          </div>
+          
+          {/* Main Content Sections: Panel 1 & Panel 2 */}
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-x-12 relative items-start">
+            {/* Artificial Vertical Divider for visual consistency */}
+            <div className="hidden xl:block absolute left-1/2 top-4 bottom-4 w-px bg-slate-200/50 -translate-x-1/2"></div>
+            
+            {/* Panel 1 */}
             <section className="space-y-6">
-              <div className="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-slate-100 flex flex-col min-h-[500px]">
-                <div className="bg-slate-50/50 px-8 py-4 border-b border-slate-100 flex justify-between items-center">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Panel 1 • {filteredOrders.filter((_, i) => i % 2 === 0).length} Órdenes</span>
-                  <div className="flex gap-1">
-                    <div className="w-2 h-2 rounded-full bg-slate-200"></div>
-                    <div className="w-2 h-2 rounded-full bg-slate-200"></div>
+              <div className="bg-white rounded-[2.5rem] shadow-none overflow-hidden border border-slate-200/60 flex flex-col min-h-[500px]">
+                <div className="flex-1 p-6 overflow-y-auto max-h-[750px] scrollbar-thin scrollbar-thumb-slate-200">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Sub-Panel 1A */}
+                    <div className="space-y-3">
+                      {filteredOrders.filter((_, i) => i % 4 === 0).map((order) => (
+                        <CompactOrderCard key={order.id} order={order} />
+                      ))}
+                    </div>
+                    {/* Sub-Panel 1B */}
+                    <div className="space-y-3">
+                      {filteredOrders.filter((_, i) => i % 4 === 1).map((order) => (
+                        <CompactOrderCard key={order.id} order={order} />
+                      ))}
+                    </div>
                   </div>
-                </div>
-                
-                <div className="flex-1">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="hidden md:table-row">
-                        <th className="pl-8 pr-4 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest italic">ID</th>
-                        <th className="px-4 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest italic">Ubicación</th>
-                        <th className="px-4 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest italic text-center">T. Rest</th>
-                        <th className="pl-4 pr-8 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest italic text-right">Estado</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-50">
-                      <AnimatePresence initial={false}>
-                        {filteredOrders.filter((_, i) => i % 2 === 0).length > 0 ? (
-                          filteredOrders.filter((_, i) => i % 2 === 0).map((order) => (
-                            <motion.tr 
-                              key={order.id}
-                              initial={{ opacity: 0, y: 4 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: -4 }}
-                              transition={{ duration: 0.15 }}
-                              className="hover:bg-slate-50/80 transition-colors group"
-                            >
-                              <td className="pl-8 pr-4 py-5">
-                                <span className="text-xl font-black text-brand-blue tracking-tighter font-mono">{order.id.replace('#', '')}</span>
-                              </td>
-                              <td className="px-4 py-5 group-hover:translate-x-1 transition-transform">
-                                <div className="flex flex-col">
-                                  <span className="font-bold text-slate-800 text-sm leading-tight">{order.location}</span>
-                                  <span className="text-[9px] text-slate-400 font-bold uppercase tracking-tight truncate max-w-[120px]">{order.stage}</span>
-                                </div>
-                              </td>
-                              <td className="px-4 py-5 text-center">
-                                <span className={`text-lg font-black tabular-nums ${
-                                  order.remainingTime <= 0 ? 'text-brand-red animate-pulse' : 
-                                  order.remainingTime <= 60 ? 'text-brand-orange' : 'text-brand-green'
-                                }`}>
-                                  {order.remainingTime}<span className="text-[10px] ml-0.5">'</span>
-                                </span>
-                              </td>
-                              <td className="pl-4 pr-8 py-5 text-right">
-                                <span className={`text-[8px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest shadow-sm inline-block whitespace-nowrap ${getStatusColor(order.status)}`}>
-                                  {order.status}
-                                </span>
-                              </td>
-                            </motion.tr>
-                          ))
-                        ) : (
-                          <motion.tr
-                            key={`empty-0-${filter}`}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                          >
-                            <td colSpan={4} className="py-24 text-center">
-                              <div className="flex flex-col items-center gap-3 opacity-20">
-                                <Box size={40} className="text-slate-400" />
-                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic font-bold">Panel vacío</p>
-                              </div>
-                            </td>
-                          </motion.tr>
-                        )}
-                      </AnimatePresence>
-                    </tbody>
-                  </table>
+                  {filteredOrders.filter((_, i) => i % 4 === 0 || i % 4 === 1).length === 0 && (
+                    <div className="py-20 flex flex-col items-center justify-center opacity-20">
+                      <Box size={40} className="text-slate-400" />
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Sin datos</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </section>
-          </div>
 
-          {/* --- COLUMNA DERECHA --- */}
-          <div className="space-y-8">
-            {/* Panel de Logística (Salidas Recientes) */}
-            <LogisticsOutSection onOpenHistory={() => setShowHistory(true)} />
-
-            {/* Panel 2 (Filtros y Tabla) */}
+            {/* Panel 2 */}
             <section className="space-y-6 flex flex-col h-full overflow-hidden">
-              <div className="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-slate-100 flex flex-col min-h-[500px]">
-                <div className="bg-slate-50/50 px-8 py-4 border-b border-slate-100 flex justify-between items-center">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Panel 2 • {filteredOrders.filter((_, i) => i % 2 !== 0).length} Órdenes</span>
-                  <div className="flex gap-1">
-                    <div className="w-2 h-2 rounded-full bg-slate-200"></div>
-                    <div className="w-2 h-2 rounded-full bg-slate-200"></div>
+              <div className="bg-white rounded-[2.5rem] shadow-none overflow-hidden border border-slate-200/60 flex flex-col min-h-[500px]">
+                <div className="flex-1 p-6 overflow-y-auto max-h-[750px] scrollbar-thin scrollbar-thumb-slate-200">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Sub-Panel 2A */}
+                    <div className="space-y-3">
+                      {filteredOrders.filter((_, i) => i % 4 === 2).map((order) => (
+                        <CompactOrderCard key={order.id} order={order} />
+                      ))}
+                    </div>
+                    {/* Sub-Panel 2B */}
+                    <div className="space-y-3">
+                      {filteredOrders.filter((_, i) => i % 4 === 3).map((order) => (
+                        <CompactOrderCard key={order.id} order={order} />
+                      ))}
+                    </div>
                   </div>
-                </div>
-                
-                <div className="flex-1">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="hidden md:table-row">
-                        <th className="pl-8 pr-4 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest italic">ID</th>
-                        <th className="px-4 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest italic">Ubicación</th>
-                        <th className="px-4 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest italic text-center">T. Rest</th>
-                        <th className="pl-4 pr-8 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest italic text-right">Estado</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-50">
-                      <AnimatePresence initial={false}>
-                        {filteredOrders.filter((_, i) => i % 2 !== 0).length > 0 ? (
-                          filteredOrders.filter((_, i) => i % 2 !== 0).map((order) => (
-                            <motion.tr 
-                              key={order.id}
-                              initial={{ opacity: 0, y: 4 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: -4 }}
-                              transition={{ duration: 0.15 }}
-                              className="hover:bg-slate-50/80 transition-colors group"
-                            >
-                              <td className="pl-8 pr-4 py-5">
-                                <span className="text-xl font-black text-brand-blue tracking-tighter font-mono">{order.id.replace('#', '')}</span>
-                              </td>
-                              <td className="px-4 py-5 group-hover:translate-x-1 transition-transform">
-                                <div className="flex flex-col">
-                                  <span className="font-bold text-slate-800 text-sm leading-tight">{order.location}</span>
-                                  <span className="text-[9px] text-slate-400 font-bold uppercase tracking-tight truncate max-w-[120px]">{order.stage}</span>
-                                </div>
-                              </td>
-                              <td className="px-4 py-5 text-center">
-                                <span className={`text-lg font-black tabular-nums ${
-                                  order.remainingTime <= 0 ? 'text-brand-red animate-pulse' : 
-                                  order.remainingTime <= 60 ? 'text-brand-orange' : 'text-brand-green'
-                                }`}>
-                                  {order.remainingTime}<span className="text-[10px] ml-0.5">'</span>
-                                </span>
-                              </td>
-                              <td className="pl-4 pr-8 py-5 text-right">
-                                <span className={`text-[8px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest shadow-sm inline-block whitespace-nowrap ${getStatusColor(order.status)}`}>
-                                  {order.status}
-                                </span>
-                              </td>
-                            </motion.tr>
-                          ))
-                        ) : (
-                          <motion.tr
-                            key={`empty-1-${filter}`}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                          >
-                            <td colSpan={4} className="py-24 text-center">
-                              <div className="flex flex-col items-center gap-3 opacity-20">
-                                <Box size={40} className="text-slate-400" />
-                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic font-bold">Panel vacío</p>
-                              </div>
-                            </td>
-                          </motion.tr>
-                        )}
-                      </AnimatePresence>
-                    </tbody>
-                  </table>
+                  {filteredOrders.filter((_, i) => i % 4 === 2 || i % 4 === 3).length === 0 && (
+                    <div className="py-20 flex flex-col items-center justify-center opacity-20">
+                      <Box size={40} className="text-slate-400" />
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Sin datos</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </section>
           </div>
         </div>
-
       </main>
 
 
@@ -859,9 +797,6 @@ export default function App() {
 
       {/* Breakdown Summary Section (Persistent Table Below) */}
 
-      <footer className="mt-auto py-10 text-center text-slate-400 text-xs font-medium">
-        <p>© 2026 Sistema de Gestión de Laboratorio Óptico v1.0.0-Beta</p>
-      </footer>
     </div>
   );
 }
