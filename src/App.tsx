@@ -439,37 +439,20 @@ function StageProgressCard({ stage, count, colorClass, icon: Icon, isSelected, o
 }
 
 const LogisticsOutSection: React.FC<{ onOpenHistory: () => void }> = ({ onOpenHistory }) => (
-  <div className="bg-slate-200 text-slate-900 p-2 rounded-2xl shadow-xl border border-slate-300 relative overflow-hidden h-[60px] flex flex-col shrink-0">
+  <div className="bg-slate-200 text-slate-900 px-2 py-1 rounded-2xl shadow-xl border border-slate-300 relative overflow-hidden h-[60px] flex items-center shrink-0">
     <div className="absolute top-0 right-0 w-16 h-16 bg-brand-blue/5 blur-xl rounded-full -mr-4 -mt-4"></div>
-    <div className="relative z-10 flex flex-col h-full justify-between">
-      <div className="flex items-center justify-between">
-        <span className="text-[7px] font-black text-brand-blue uppercase tracking-[0.2em] italic flex items-center gap-1">
-          <Truck size={10} />
-          Salidas
-        </span>
-        <button 
-          onClick={onOpenHistory}
-          className="text-slate-400 hover:text-brand-blue transition-all relative group/hist"
-          title="Abrir historial"
-        >
-          <History size={10} />
-          <span className="absolute right-full mr-2 top-0 px-1.5 py-0.5 bg-brand-blue text-[6px] font-black text-white uppercase tracking-tighter rounded border border-white/10 opacity-0 group-hover/hist:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20 shadow-xl">
-            Abrir historial
-          </span>
-        </button>
-      </div>
-      
-      <div className="flex-1 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-300">
-        <div className="flex flex-col gap-1.5 py-1">
+    <div className="relative z-10 flex items-center gap-2 w-full h-full">
+      <div className="flex-1 h-full overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-300">
+        <div className="flex flex-col gap-1 py-0.5">
           {LOGISTICS_OUT.map((job) => (
-            <div key={job.id} className="flex items-center gap-2 bg-white/50 backdrop-blur-sm p-1 rounded-lg border border-slate-300/50">
-              <div className="w-7 h-7 bg-brand-blue/10 rounded flex items-center justify-center shrink-0">
-                <Truck size={12} className="text-brand-blue" />
+            <div key={job.id} className="flex items-center gap-2 bg-white/50 backdrop-blur-sm p-1.5 rounded-xl border border-slate-300/50">
+              <div className="w-8 h-8 bg-brand-blue/10 rounded-lg flex items-center justify-center shrink-0">
+                <Truck size={16} className="text-brand-blue" />
               </div>
               <div className="flex-1 min-w-0">
-                 <div className="flex items-baseline justify-between">
-                   <span className="text-xs font-black text-brand-blue leading-none">{job.id.replace('#', '')}</span>
-                   <span className="text-[6px] font-black text-slate-600 uppercase tracking-tighter bg-slate-100 px-1 py-0.5 rounded border border-slate-300/50 truncate ml-2">
+                 <div className="flex items-center justify-between">
+                   <span className="text-xl font-black text-brand-blue leading-none tracking-tighter">{job.id.replace('#', '')}</span>
+                   <span className="text-[7px] font-black text-slate-500 uppercase tracking-tighter bg-slate-100 px-1.5 py-0.5 rounded-md border border-slate-300/50 truncate ml-2">
                      {job.destination}
                    </span>
                  </div>
@@ -478,6 +461,18 @@ const LogisticsOutSection: React.FC<{ onOpenHistory: () => void }> = ({ onOpenHi
           ))}
         </div>
       </div>
+      
+      <button 
+        onClick={onOpenHistory}
+        className="w-10 h-10 flex items-center justify-center bg-white/80 hover:bg-white text-brand-blue rounded-xl shadow-sm border border-slate-300 transition-all group/hist shrink-0 relative"
+        title="Abrir historial"
+      >
+        <History size={18} />
+        <div className="absolute inset-0 bg-brand-blue/5 scale-0 group-hover/hist:scale-125 rounded-full blur-md transition-transform"></div>
+        <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 px-1.5 py-0.5 bg-brand-blue text-[6px] font-black text-white uppercase tracking-tighter rounded border border-white/10 opacity-0 group-hover/hist:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20 shadow-xl">
+          Abrir historial
+        </span>
+      </button>
     </div>
   </div>
 );
