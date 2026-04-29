@@ -129,15 +129,7 @@ const INITIAL_ORDERS: Order[] = [
   { id: '#11408', location: 'Maipú', promisedTime: '12:00', stage: 'Antireflejo', remainingTime: 90, status: 'A tiempo' },
   { id: '#11409', location: 'Yerba Buena', promisedTime: '12:15', stage: 'Logística', remainingTime: 15, status: 'Retrasado' },
   { id: '#11410', location: 'Concepción', promisedTime: '12:30', stage: 'Calibrado', remainingTime: 180, status: 'A tiempo' },
-  { id: '#11411', location: '24 de Septiembre', promisedTime: '12:45', stage: 'Superficie', remainingTime: -45, status: 'Vencida' },
-  { id: '#11412', location: 'Maipú', promisedTime: '13:00', stage: 'Calibrado', remainingTime: 20, status: 'Retrasado' },
-  { id: '#11413', location: 'Yerba Buena', promisedTime: '13:15', stage: 'Cristales', remainingTime: 45, status: 'A tiempo' },
-  { id: '#11414', location: 'Aguilares', promisedTime: '13:30', stage: 'Antireflejo', remainingTime: 10, status: 'Retrasado' },
-  { id: '#11415', location: 'Solmar Mendoza', promisedTime: '13:45', stage: 'Superficie', remainingTime: 60, status: 'A tiempo' },
-  { id: '#11416', location: 'Junín', promisedTime: '14:00', stage: 'Logística', remainingTime: -15, status: 'Vencida' },
-  { id: '#11417', location: '9 de Julio', promisedTime: '14:15', stage: 'Cristales', remainingTime: 30, status: 'A tiempo' },
-  { id: '#11418', location: '24 de Septiembre', promisedTime: '14:30', stage: 'Superficie', remainingTime: 15, status: 'Retrasado' },
-  { id: '#11419', location: 'Lutz Ferrando', promisedTime: '14:45', stage: 'Calibrado', remainingTime: 120, status: 'A tiempo' },
+  { id: '#11411', location: 'Aguilares', promisedTime: '13:00', stage: 'Superficie', remainingTime: 45, status: 'A tiempo' },
 ];
 
 const LOGISTICS_OUT: { id: string; destination: string; exitTime: string; items: string[] }[] = [
@@ -493,9 +485,9 @@ const LogisticsOutSection: React.FC<{ onOpenHistory: () => void }> = ({ onOpenHi
 const CompactOrderCard: React.FC<{ order: Order }> = ({ order }) => {
   const getStatusColor = (status: Status) => {
     switch (status) {
-      case 'Vencida': return 'bg-brand-red text-white border-brand-red/20 shadow-brand-red/10';
-      case 'Retrasado': return 'bg-brand-orange text-white border-brand-orange/20 shadow-brand-orange/10';
-      default: return 'bg-brand-green text-white border-brand-green/20 shadow-brand-green/10';
+      case 'Vencida': return 'bg-brand-red/10 text-brand-red border-brand-red/20 shadow-sm';
+      case 'Retrasado': return 'bg-brand-orange/10 text-brand-orange border-brand-orange/20 shadow-sm';
+      default: return 'bg-brand-green/10 text-brand-green border-brand-green/20 shadow-sm';
     }
   };
 
@@ -503,32 +495,37 @@ const CompactOrderCard: React.FC<{ order: Order }> = ({ order }) => {
     <motion.div 
       initial={{ opacity: 0, y: 5 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white border border-slate-100 rounded-xl p-1.5 shadow-none hover:bg-slate-50 transition-all group relative overflow-hidden"
+      className="bg-white border border-slate-100 rounded-xl p-1.5 hover:bg-slate-50 transition-all group flex items-center gap-3 shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
     >
-      <div className="flex items-center justify-between mb-0.5">
-        <span className="text-sm font-black text-brand-blue font-mono tracking-tighter">
-          {order.id.replace('#', '')}
-        </span>
-        <span className={`text-[7px] font-black px-1 py-0.5 rounded uppercase tracking-tighter shadow-sm border ${getStatusColor(order.status)}`}>
-          {order.status}
-        </span>
-      </div>
-      
-      <div className="flex items-end justify-between gap-1">
-        <div className="flex flex-col min-w-0">
-          <span className="text-[10px] font-bold text-slate-800 leading-none truncate">{order.location}</span>
-          <span className="text-[8px] text-slate-400 font-bold uppercase tracking-tighter truncate">{order.stage}</span>
+      <div className="flex items-center gap-2 flex-1 min-w-0">
+        <div className="flex flex-col shrink-0 items-center justify-center bg-slate-50 w-14 min-h-[40px] rounded-lg border border-slate-100 shadow-inner">
+          <span className="text-[15px] font-black text-brand-blue font-mono leading-none">
+            {order.id.replace('#', '')}
+          </span>
         </div>
         
-        <div className="flex items-baseline gap-0.5 text-right shrink-0">
-          <span className={`text-sm font-black italic tabular-nums ${
+        <div className="flex flex-col min-w-0 flex-1">
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs font-black text-slate-900 leading-tight truncate">{order.location}</span>
+          </div>
+          <span className="text-[10px] text-slate-600 font-black uppercase tracking-tighter truncate leading-none mt-0.5">{order.stage}</span>
+        </div>
+      </div>
+      
+      <div className="flex items-center gap-2 shrink-0 pr-1">
+        <div className="flex flex-col items-end">
+          <span className={`text-base font-black italic leading-none tabular-nums ${
             order.remainingTime <= 0 ? 'text-brand-red' : 
             order.remainingTime <= 60 ? 'text-brand-orange' : 'text-brand-green'
           }`}>
             {order.remainingTime}
           </span>
-          <span className="text-[8px] font-bold text-slate-300 italic">'</span>
+          <span className="text-[6px] font-black uppercase text-slate-300 -mt-0.5">min</span>
         </div>
+        
+        <span className={`text-[7px] font-black px-1.5 py-0.5 rounded-lg uppercase tracking-tighter border ${getStatusColor(order.status)}`}>
+          {order.status}
+        </span>
       </div>
     </motion.div>
   );
@@ -683,13 +680,13 @@ export default function App() {
                 <div className="flex-1 p-4 overflow-y-auto max-h-[1400px] scrollbar-thin scrollbar-thumb-slate-200">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {/* Sub-Panel 1A */}
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                       {filteredOrders.filter((_, i) => i % 4 === 0).map((order) => (
                         <CompactOrderCard key={order.id} order={order} />
                       ))}
                     </div>
                     {/* Sub-Panel 1B */}
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                       {filteredOrders.filter((_, i) => i % 4 === 1).map((order) => (
                         <CompactOrderCard key={order.id} order={order} />
                       ))}
@@ -711,13 +708,13 @@ export default function App() {
                 <div className="flex-1 p-4 overflow-y-auto max-h-[1400px] scrollbar-thin scrollbar-thumb-slate-200">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {/* Sub-Panel 2A */}
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                       {filteredOrders.filter((_, i) => i % 4 === 2).map((order) => (
                         <CompactOrderCard key={order.id} order={order} />
                       ))}
                     </div>
                     {/* Sub-Panel 2B */}
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                       {filteredOrders.filter((_, i) => i % 4 === 3).map((order) => (
                         <CompactOrderCard key={order.id} order={order} />
                       ))}
