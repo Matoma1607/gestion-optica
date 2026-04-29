@@ -608,14 +608,6 @@ export default function App() {
 
             {/* Breakdown Summary Section (Panel 1) */}
             <section className="space-y-6">
-              <div className="flex flex-col gap-1">
-                <h2 className="text-3xl font-black text-slate-900 tracking-tight uppercase italic flex items-center gap-3">
-                  <ClipboardList size={32} className="text-brand-blue" />
-                  Resumen de Órdenes
-                </h2>
-                <p className="text-slate-500 font-medium italic text-xs">Desglose detallado de todos los pedidos en curso.</p>
-              </div>
-
               <div className="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-slate-100 flex flex-col min-h-[500px]">
                 <div className="bg-slate-50/50 px-8 py-4 border-b border-slate-100 flex justify-between items-center">
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Panel 1 • {filteredOrders.filter((_, i) => i % 2 === 0).length} Órdenes</span>
@@ -701,34 +693,6 @@ export default function App() {
 
             {/* Panel 2 (Filtros y Tabla) */}
             <section className="space-y-6 flex flex-col h-full overflow-hidden">
-              <div className="flex justify-end pt-2">
-                <div className="flex bg-white p-1 rounded-2xl border border-slate-200 shadow-sm overflow-x-auto max-w-full">
-                  {(['Todas', 'Vencidas', 'Retrasado'] as const).map((f) => (
-                    <button
-                      key={f}
-                      onClick={() => setFilter(f)}
-                      className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all whitespace-nowrap flex items-center justify-center gap-2 ${
-                        filter === f 
-                          ? (f === 'Vencidas' ? 'bg-brand-red text-white' : f === 'Retrasado' ? 'bg-brand-orange text-white' : 'bg-brand-blue text-white') + ' shadow-lg scale-105'
-                          : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
-                      }`}
-                    >
-                      <span>{f}</span>
-                      {filterCounts[f] > 0 && (
-                        <span className={`flex items-center justify-center min-w-[18px] h-4.5 px-1 rounded-full text-[9px] font-black ${
-                          filter === f ? 'bg-white/20 text-white' :
-                          f === 'Vencidas' ? 'bg-brand-red text-white' : 
-                          f === 'Retrasado' ? 'bg-brand-orange text-white' : 
-                          'bg-slate-100 text-slate-500'
-                        }`}>
-                          {filterCounts[f]}
-                        </span>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
               <div className="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-slate-100 flex flex-col min-h-[500px]">
                 <div className="bg-slate-50/50 px-8 py-4 border-b border-slate-100 flex justify-between items-center">
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Panel 2 • {filteredOrders.filter((_, i) => i % 2 !== 0).length} Órdenes</span>
