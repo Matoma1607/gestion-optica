@@ -384,43 +384,44 @@ interface StageProgressCardProps {
   onClick?: () => void;
 }
 
-function StageProgressCard({ stage, count, total, colorClass, icon: Icon, isSelected, onClick }: StageProgressCardProps) {
-  const progress = (count / total) * 100;
+function StageProgressCard({ stage, count, colorClass, icon: Icon, isSelected, onClick }: StageProgressCardProps & { count: number }) {
   return (
     <motion.div 
-      whileHover={{ y: -2, scale: 1.01 }}
-      whileTap={{ scale: 0.98 }}
+      whileHover={{ y: -2, scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
       onClick={onClick}
-      className={`p-4 rounded-2xl cursor-pointer transition-all border min-h-[120px] flex flex-col justify-between ${
+      className={`relative p-2 rounded-xl cursor-pointer transition-all flex flex-col items-center justify-center gap-1 group aspect-square w-[72px] shrink-0 ${
         isSelected 
-          ? 'bg-brand-blue border-transparent ring-4 ring-brand-blue/10 shadow-lg' 
-          : 'bg-white border-slate-100 shadow-sm hover:shadow-md'
+          ? 'bg-brand-blue shadow-lg shadow-brand-blue/20' 
+          : 'bg-white border border-slate-100 shadow-sm hover:shadow-md hover:border-brand-blue/20'
       }`}
     >
-      <div className="flex justify-between items-start">
-        <div className={`p-2 rounded-xl ${isSelected ? 'bg-white/20 text-white' : `${colorClass.replace('bg-', 'bg-opacity-10 text-')}`}`}>
-          <Icon size={18} />
+      {/* Task Count Badge */}
+      {count > 0 && (
+        <div className={`absolute -top-1 -right-1 min-w-[18px] h-4.5 flex items-center justify-center rounded-full px-1 text-[8px] font-black z-10 shadow-sm border ${
+          isSelected 
+            ? 'bg-brand-green text-brand-blue border-white/20' 
+            : 'bg-brand-blue text-white border-white/10'
+        }`}>
+          {count}
         </div>
-        <div className="text-right">
-          <span className={`text-2xl font-black ${isSelected ? 'text-white' : 'text-slate-800'}`}>{count}</span>
-          <p className={`text-[9px] font-bold uppercase tracking-widest ${isSelected ? 'text-blue-200' : 'text-slate-400'}`}>Tareas</p>
-        </div>
+      )}
+
+      {/* Main Icon Box */}
+      <div className={`p-1.5 rounded-lg transition-all group-hover:scale-110 ${
+        isSelected 
+          ? 'bg-white/20 text-white' 
+          : `${colorClass.replace('bg-', 'bg-opacity-10 text-')}`
+      }`}>
+        <Icon size={20} strokeWidth={2.5} />
       </div>
       
-      <div className="mt-2">
-        <div className={`flex justify-between items-end mb-1.5 ${isSelected ? 'text-blue-100' : 'text-slate-500'}`}>
-          <span className="text-[10px] font-black uppercase tracking-wider truncate mr-2">{stage}</span>
-          <span className="text-[8px] font-mono font-bold opacity-70 shrink-0">{Math.round(progress)}%</span>
-        </div>
-        <div className={`w-full h-1 rounded-full overflow-hidden ${isSelected ? 'bg-white/10' : 'bg-slate-100'}`}>
-          <motion.div 
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            className={`h-full rounded-full ${isSelected ? 'bg-brand-green' : colorClass}`}
-          />
-        </div>
-      </div>
+      {/* Label */}
+      <span className={`text-[8px] font-black uppercase tracking-tighter text-center leading-[1.1] transition-colors line-clamp-2 w-full px-0.5 ${
+        isSelected ? 'text-white' : 'text-slate-600'
+      }`}>
+        {stage}
+      </span>
     </motion.div>
   );
 }
@@ -589,11 +590,11 @@ export default function App() {
               <div className="h-0.5 flex-1 bg-slate-100 hidden xl:block"></div>
             </div>
             
-            <div className="flex gap-3 overflow-x-auto pb-4 snap-x">
+            <div className="flex items-center gap-2 overflow-x-auto pb-4 pt-1 snap-x no-scrollbar">
               {stats.map((stat: { stage: string; count: number; total: number }, idx: number) => (
-                <div key={stat.stage} className="min-w-[180px] md:min-w-[220px] snap-start">
+                <div key={stat.stage} className="snap-start flex-shrink-0">
                   <SmartTooltip 
-                    text={`Pedidos esperando en ${stat.stage}`}
+                    text={`${stat.count} tareas en ${stat.stage}`}
                     position="top"
                   >
                     <StageProgressCard 
