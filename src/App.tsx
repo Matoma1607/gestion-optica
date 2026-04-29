@@ -130,6 +130,14 @@ const INITIAL_ORDERS: Order[] = [
   { id: '#11409', location: 'Yerba Buena', promisedTime: '12:15', stage: 'Logística', remainingTime: 15, status: 'Retrasado' },
   { id: '#11410', location: 'Concepción', promisedTime: '12:30', stage: 'Calibrado', remainingTime: 180, status: 'A tiempo' },
   { id: '#11411', location: '24 de Septiembre', promisedTime: '12:45', stage: 'Superficie', remainingTime: -45, status: 'Vencida' },
+  { id: '#11412', location: 'Maipú', promisedTime: '13:00', stage: 'Calibrado', remainingTime: 20, status: 'Retrasado' },
+  { id: '#11413', location: 'Yerba Buena', promisedTime: '13:15', stage: 'Cristales', remainingTime: 45, status: 'A tiempo' },
+  { id: '#11414', location: 'Aguilares', promisedTime: '13:30', stage: 'Antireflejo', remainingTime: 10, status: 'Retrasado' },
+  { id: '#11415', location: 'Solmar Mendoza', promisedTime: '13:45', stage: 'Superficie', remainingTime: 60, status: 'A tiempo' },
+  { id: '#11416', location: 'Junín', promisedTime: '14:00', stage: 'Logística', remainingTime: -15, status: 'Vencida' },
+  { id: '#11417', location: '9 de Julio', promisedTime: '14:15', stage: 'Cristales', remainingTime: 30, status: 'A tiempo' },
+  { id: '#11418', location: '24 de Septiembre', promisedTime: '14:30', stage: 'Superficie', remainingTime: 15, status: 'Retrasado' },
+  { id: '#11419', location: 'Lutz Ferrando', promisedTime: '14:45', stage: 'Calibrado', remainingTime: 120, status: 'A tiempo' },
 ];
 
 const LOGISTICS_OUT: { id: string; destination: string; exitTime: string; items: string[] }[] = [
@@ -439,17 +447,17 @@ function StageProgressCard({ stage, count, colorClass, icon: Icon, isSelected, o
 }
 
 const LogisticsOutSection: React.FC<{ onOpenHistory: () => void }> = ({ onOpenHistory }) => (
-  <div className="bg-slate-900 text-white p-2 rounded-2xl shadow-xl border border-white/5 relative overflow-hidden h-[60px] flex flex-col shrink-0">
-    <div className="absolute top-0 right-0 w-16 h-16 bg-brand-green/10 blur-xl rounded-full -mr-4 -mt-4"></div>
+  <div className="bg-slate-200 text-slate-900 p-2 rounded-2xl shadow-xl border border-slate-300 relative overflow-hidden h-[60px] flex flex-col shrink-0">
+    <div className="absolute top-0 right-0 w-16 h-16 bg-brand-blue/5 blur-xl rounded-full -mr-4 -mt-4"></div>
     <div className="relative z-10 flex flex-col h-full justify-between">
       <div className="flex items-center justify-between">
-        <span className="text-[7px] font-black text-brand-green uppercase tracking-[0.2em] italic flex items-center gap-1">
+        <span className="text-[7px] font-black text-brand-blue uppercase tracking-[0.2em] italic flex items-center gap-1">
           <Truck size={10} />
           Salidas
         </span>
         <button 
           onClick={onOpenHistory}
-          className="text-white/40 hover:text-white transition-all relative group/hist"
+          className="text-slate-400 hover:text-brand-blue transition-all relative group/hist"
           title="Abrir historial"
         >
           <History size={10} />
@@ -459,17 +467,17 @@ const LogisticsOutSection: React.FC<{ onOpenHistory: () => void }> = ({ onOpenHi
         </button>
       </div>
       
-      <div className="flex-1 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-white/10">
+      <div className="flex-1 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-300">
         <div className="flex flex-col gap-1.5 py-1">
           {LOGISTICS_OUT.map((job) => (
-            <div key={job.id} className="flex items-center gap-2 bg-white/5 p-1 rounded-lg border border-white/5">
-              <div className="w-7 h-7 bg-brand-green/20 rounded flex items-center justify-center shrink-0">
-                <Truck size={12} className="text-brand-green" />
+            <div key={job.id} className="flex items-center gap-2 bg-white/50 backdrop-blur-sm p-1 rounded-lg border border-slate-300/50">
+              <div className="w-7 h-7 bg-brand-blue/10 rounded flex items-center justify-center shrink-0">
+                <Truck size={12} className="text-brand-blue" />
               </div>
               <div className="flex-1 min-w-0">
                  <div className="flex items-baseline justify-between">
-                   <span className="text-xs font-black text-brand-green leading-none">{job.id.replace('#', '')}</span>
-                   <span className="text-[6px] font-black text-brand-green uppercase tracking-tighter bg-brand-green/10 px-1 py-0.5 rounded border border-brand-green/20 truncate ml-2">
+                   <span className="text-xs font-black text-brand-blue leading-none">{job.id.replace('#', '')}</span>
+                   <span className="text-[6px] font-black text-slate-600 uppercase tracking-tighter bg-slate-100 px-1 py-0.5 rounded border border-slate-300/50 truncate ml-2">
                      {job.destination}
                    </span>
                  </div>
