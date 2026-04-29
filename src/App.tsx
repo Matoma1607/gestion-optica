@@ -211,7 +211,7 @@ const MonitorView: React.FC<{
           </div>
         </div>
 
-        <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10 w-full xl:w-auto overflow-x-auto scrollbar-hide shrink-0">
+        <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10 w-full xl:w-auto overflow-x-auto shrink-0">
           {(['Todas', 'Vencidas', 'Retrasado'] as const).map((f) => (
             <button
               key={f}
@@ -245,8 +245,8 @@ const MonitorView: React.FC<{
             {[0, 1].map((panelIdx) => {
               const panelOrders = filteredOrders.filter((_, i) => i % 2 === panelIdx);
               return (
-                <div key={panelIdx} className="bg-white rounded-[1.2rem] sm:rounded-[1.5rem] md:rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/10 w-full h-full min-h-[100px]">
-                  <div className="overflow-x-auto w-full scrollbar-hide">
+                <div key={panelIdx} className="bg-white rounded-[1.2rem] sm:rounded-[1.5rem] md:rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/10 w-full h-full min-h-[500px]">
+                  <div className="overflow-x-auto w-full">
                     <table className="w-full text-left border-collapse min-w-[450px] sm:min-w-[500px]">
                       <thead>
                         <tr className="bg-slate-50">
@@ -463,7 +463,7 @@ const LogisticsOutSection: React.FC<{ onOpenHistory: () => void }> = ({ onOpenHi
         </button>
       </div>
       
-      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
+      <div className="flex gap-4 overflow-x-auto pb-4 snap-x">
         {LOGISTICS_OUT.map((job, idx) => (
           <div key={job.id} className="min-w-[280px] snap-start">
             <SmartTooltip 
@@ -620,12 +620,12 @@ export default function App() {
               <div className="h-0.5 flex-1 mx-4 bg-slate-100 hidden xl:block"></div>
             </div>
             
-            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x">
+            <div className="flex gap-3 overflow-x-auto pb-4 snap-x">
               {stats.map((stat: { stage: string; count: number; total: number }, idx: number) => (
                 <div key={stat.stage} className="min-w-[180px] md:min-w-[220px] snap-start">
                   <SmartTooltip 
                     text={`Pedidos esperando en ${stat.stage}`}
-                    position="bottom"
+                    position="top"
                   >
                     <StageProgressCard 
                       stage={stat.stage} 
@@ -672,7 +672,7 @@ export default function App() {
               <p className="text-slate-500 font-medium mt-1">Desglose detallado de todos los pedidos en curso.</p>
             </div>
 
-            <div className="flex bg-white p-1 rounded-2xl border border-slate-200 shadow-sm overflow-x-auto scrollbar-hide max-w-full">
+            <div className="flex bg-white p-1 rounded-2xl border border-slate-200 shadow-sm overflow-x-auto max-w-full">
               {(['Todas', 'Vencidas', 'Retrasado'] as const).map((f) => (
                 <button
                   key={f}
