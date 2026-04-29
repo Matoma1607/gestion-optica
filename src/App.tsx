@@ -561,7 +561,7 @@ export default function App() {
   return (
     <div className="min-h-screen pb-12 flex flex-col bg-slate-50">
       
-      <main className="flex-1 w-full px-4 pt-0 pb-12">
+      <main className="flex-1 w-full px-4 pt-4 pb-12">
         
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-x-12 gap-y-8 relative max-w-[1900px] mx-auto items-start">
           {/* Artificial Vertical Divider for visual consistency */}
