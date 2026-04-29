@@ -19,6 +19,7 @@ import {
   Maximize2,
   ExternalLink,
   ArrowRight,
+  Box,
   LucideIcon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -697,58 +698,68 @@ export default function App() {
 
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
             {[0, 1].map((panelIdx) => {
-              // Distribución estable basada en el ID para evitar saltos entre paneles al filtrar
               const panelOrders = filteredOrders.filter((order) => {
                 const num = parseInt(order.id.replace('#', ''));
                 return isNaN(num) ? true : num % 2 === panelIdx;
               });
               
               return (
-                <div key={panelIdx} className="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-slate-100 min-h-[300px]">
-                  <div className="overflow-x-auto w-full">
-                    <table className="w-full text-left border-collapse min-w-[400px]">
+                <div key={panelIdx} className="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-slate-100 flex flex-col min-h-[500px]">
+                  <div className="bg-slate-50/50 px-8 py-4 border-b border-slate-100 flex justify-between items-center">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Panel {panelIdx + 1} • {panelOrders.length} Órdenes</span>
+                    <div className="flex gap-1">
+                      <div className="w-2 h-2 rounded-full bg-slate-200"></div>
+                      <div className="w-2 h-2 rounded-full bg-slate-200"></div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex-1">
+                    <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="bg-slate-50">
-                          <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic">Orden</th>
-                          <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic">Local</th>
-                          <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic text-center">T. Rest</th>
-                          <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic text-right">Estado</th>
+                        <tr className="hidden md:table-row">
+                          <th className="pl-8 pr-4 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest italic">ID</th>
+                          <th className="px-4 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest italic">Ubicación</th>
+                          <th className="px-4 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest italic text-center">T. Rest</th>
+                          <th className="pl-4 pr-8 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest italic text-right">Estado</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-50">
-                        <AnimatePresence initial={false} mode="wait">
+                        <AnimatePresence mode="popLayout" initial={false}>
                           {panelOrders.length > 0 ? (
-                            <motion.g
-                              key={`${panelIdx}-${filter}-${selectedStage}`}
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              exit={{ opacity: 0 }}
-                              transition={{ duration: 0.15 }}
-                            >
-                              {panelOrders.map((order) => (
-                                <tr key={order.id} className="hover:bg-slate-50/80 transition-colors group">
-                                  <td className="px-6 py-6">
-                                    <span className="text-lg font-black text-brand-blue tracking-tight font-mono">#{order.id.replace('#', '')}</span>
-                                  </td>
-                                  <td className="px-6 py-6 font-bold text-slate-800 text-sm">
-                                    {order.location}
-                                  </td>
-                                  <td className="px-6 py-6 text-center">
-                                    <span className={`text-xl font-black ${
-                                      order.remainingTime <= 0 ? 'text-brand-red animate-pulse' : 
-                                      order.remainingTime <= 60 ? 'text-brand-orange' : 'text-brand-green'
-                                    }`}>
-                                      {order.remainingTime}'
-                                    </span>
-                                  </td>
-                                  <td className="px-6 py-6 text-right">
-                                    <span className={`text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest shadow-sm inline-block ${getStatusColor(order.status)}`}>
-                                      {order.status}
-                                    </span>
-                                  </td>
-                                </tr>
-                              ))}
-                            </motion.g>
+                            panelOrders.map((order) => (
+                              <motion.tr 
+                                key={order.id}
+                                layout
+                                initial={{ opacity: 0, x: panelIdx === 0 ? -10 : 10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                transition={{ duration: 0.2 }}
+                                className="hover:bg-slate-50/80 transition-colors group"
+                              >
+                                <td className="pl-8 pr-4 py-5">
+                                  <span className="text-base font-black text-brand-blue tracking-tighter font-mono">#{order.id.replace('#', '')}</span>
+                                </td>
+                                <td className="px-4 py-5 group-hover:translate-x-1 transition-transform">
+                                  <div className="flex flex-col">
+                                    <span className="font-bold text-slate-800 text-sm leading-tight">{order.location}</span>
+                                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-tight truncate max-w-[120px]">{order.stage}</span>
+                                  </div>
+                                </td>
+                                <td className="px-4 py-5 text-center">
+                                  <span className={`text-lg font-black tabular-nums ${
+                                    order.remainingTime <= 0 ? 'text-brand-red animate-pulse' : 
+                                    order.remainingTime <= 60 ? 'text-brand-orange' : 'text-brand-green'
+                                  }`}>
+                                    {order.remainingTime}<span className="text-[10px] ml-0.5">'</span>
+                                  </span>
+                                </td>
+                                <td className="pl-4 pr-8 py-5 text-right">
+                                  <span className={`text-[8px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest shadow-sm inline-block whitespace-nowrap ${getStatusColor(order.status)}`}>
+                                    {order.status}
+                                  </span>
+                                </td>
+                              </motion.tr>
+                            ))
                           ) : (
                             <motion.tr
                               key={`empty-${panelIdx}`}
@@ -756,10 +767,13 @@ export default function App() {
                               animate={{ opacity: 1 }}
                               exit={{ opacity: 0 }}
                             >
-                              <td colSpan={4} className="py-20 text-center">
-                                <p className="text-xs font-black uppercase tracking-widest text-slate-300 italic">
-                                  {panelIdx === 0 && filteredOrders.length === 0 ? 'Sin órdenes para mostrar' : ''}
-                                </p>
+                              <td colSpan={4} className="py-24 text-center">
+                                <div className="flex flex-col items-center gap-3 opacity-20">
+                                  <Box size={40} className="text-slate-400" />
+                                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">
+                                    {panelIdx === 0 && filteredOrders.length === 0 ? 'Sin registros' : 'Fin de lista'}
+                                  </p>
+                                </div>
                               </td>
                             </motion.tr>
                           )}
