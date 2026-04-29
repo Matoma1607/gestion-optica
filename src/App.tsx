@@ -642,7 +642,7 @@ export default function App() {
           </section>
         </div>
 
-        {/* Breakdown Summary Section (Persistent Table Below) */}
+        {/* Breakdown Summary Section (Split into two panels) */}
         <section className="mt-12 space-y-6">
           <div className="flex flex-col md:flex-row justify-between items-end gap-6">
             <div>
@@ -680,114 +680,78 @@ export default function App() {
             </div>
           </div>
 
-          <div className="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-slate-100">
-            <div className="overflow-x-auto w-full">
-              <table className="w-full text-left border-collapse min-w-[800px]">
-                <thead>
-                  <tr className="bg-slate-50">
-                    <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic">Orden</th>
-                    <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic">Local</th>
-                    <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic">Etapa Actual</th>
-                    <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic text-center">T. Restante</th>
-                    <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic text-right">Estado</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50">
-                  <AnimatePresence mode="popLayout" initial={false}>
-                    {filteredOrders.length > 0 ? (
-                      filteredOrders.map((order, idx) => (
-                        <motion.tr 
-                          key={order.id}
-                          layout
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, scale: 0.98 }}
-                          transition={{ duration: 0.2, delay: Math.min(idx * 0.02, 0.2) }}
-                          className="hover:bg-slate-50/80 transition-colors group"
-                        >
-                          <td className="px-8 py-6">
-                            <span className="text-lg font-black text-brand-blue tracking-tight font-mono">#{order.id.replace('#', '')}</span>
-                          </td>
-                          <td className="px-8 py-6">
-                            <div className="flex flex-col">
-                              <span className="font-bold text-slate-800 text-base">{order.location}</span>
-                              <span className="text-[10px] text-slate-400 font-bold flex items-center gap-1 mt-0.5 uppercase tracking-wide">
-                                <Clock size={10} className="text-brand-blue" /> Prometido: {order.promisedTime}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-8 py-6">
-                            <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-tight border border-slate-200">
-                              {order.stage}
-                            </span>
-                          </td>
-                          <td className="px-8 py-6 text-center">
-                            <span className={`text-xl font-black ${
-                              order.remainingTime <= 0 ? 'text-brand-red animate-pulse' : 
-                              order.remainingTime <= 60 ? 'text-brand-orange' : 'text-brand-green'
-                            }`}>
-                              {order.remainingTime} <span className="text-xs uppercase ml-1">min</span>
-                            </span>
-                          </td>
-                          <td className="px-8 py-6 text-right">
-                            <span className={`text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-sm ${getStatusColor(order.status)}`}>
-                              {order.status}
-                            </span>
-                          </td>
-                        </motion.tr>
-                      ))
-                    ) : (
-                      <motion.tr
-                        key="empty"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                      >
-                        <td colSpan={5} className="py-20 text-center">
-                          <div className="flex flex-col items-center gap-2 opacity-30">
-                            <ClipboardList size={48} />
-                            <p className="text-sm font-black uppercase tracking-widest">Sin órdenes para mostrar</p>
-                            {selectedStage && (
-                              <button 
-                                onClick={() => setSelectedStage(null)}
-                                className="mt-4 text-brand-blue font-black underline uppercase text-[10px]"
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            {[0, 1].map((panelIdx) => {
+              const panelOrders = filteredOrders.filter((_, i) => i % 2 === panelIdx);
+              return (
+                <div key={panelIdx} className="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-slate-100">
+                  <div className="overflow-x-auto w-full">
+                    <table className="w-full text-left border-collapse min-w-[400px]">
+                      <thead>
+                        <tr className="bg-slate-50">
+                          <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic">Orden</th>
+                          <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic">Local</th>
+                          <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic text-center">T. Rest</th>
+                          <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic text-right">Estado</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-50">
+                        <AnimatePresence mode="popLayout" initial={false}>
+                          {panelOrders.length > 0 ? (
+                            panelOrders.map((order, idx) => (
+                              <motion.tr 
+                                key={order.id}
+                                layout
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.98 }}
+                                transition={{ duration: 0.2, delay: Math.min(idx * 0.02, 0.2) }}
+                                className="hover:bg-slate-50/80 transition-colors group"
                               >
-                                Limpiar filtro de etapa
-                              </button>
-                            )}
-                          </div>
-                        </td>
-                      </motion.tr>
-                    )}
-                  </AnimatePresence>
-                </tbody>
-              </table>
-            </div>
+                                <td className="px-6 py-6">
+                                  <span className="text-lg font-black text-brand-blue tracking-tight font-mono">#{order.id.replace('#', '')}</span>
+                                </td>
+                                <td className="px-6 py-6 font-bold text-slate-800 text-sm">
+                                  {order.location}
+                                </td>
+                                <td className="px-6 py-6 text-center">
+                                  <span className={`text-xl font-black ${
+                                    order.remainingTime <= 0 ? 'text-brand-red animate-pulse' : 
+                                    order.remainingTime <= 60 ? 'text-brand-orange' : 'text-brand-green'
+                                  }`}>
+                                    {order.remainingTime}'
+                                  </span>
+                                </td>
+                                <td className="px-6 py-6 text-right">
+                                  <span className={`text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest shadow-sm inline-block ${getStatusColor(order.status)}`}>
+                                    {order.status}
+                                  </span>
+                                </td>
+                              </motion.tr>
+                            ))
+                          ) : (
+                            <motion.tr
+                              key={`empty-${panelIdx}`}
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                            >
+                              <td colSpan={4} className="py-20 text-center">
+                                <p className="text-xs font-black uppercase tracking-widest text-slate-300 italic">
+                                  {panelIdx === 0 && filteredOrders.length === 0 ? 'Sin órdenes para mostrar' : ''}
+                                </p>
+                              </td>
+                            </motion.tr>
+                          )}
+                        </AnimatePresence>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </section>
 
-        {/* Monitor Access (Secondary UI) */}
-        <section className="pt-8">
-          <motion.div 
-            whileHover={{ y: -4 }}
-            className="bg-slate-900 p-8 md:p-10 rounded-[3rem] shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8 group border border-white/5"
-          >
-            <div className="flex items-center gap-6 min-w-0">
-              <div className="h-16 w-16 shrink-0 rounded-2xl bg-white/10 flex items-center justify-center text-white border border-white/20 group-hover:bg-brand-blue transition-all duration-500 shadow-xl">
-                <ExternalLink size={28} />
-              </div>
-              <div className="text-left min-w-0">
-                <h3 className="text-2xl font-black italic tracking-tight uppercase text-white">Modo Monitor Extendido</h3>
-                <p className="text-white/40 text-sm font-medium mt-1">Perfecto para una segunda pantalla dedicada en el taller o recepción.</p>
-              </div>
-            </div>
-            <button 
-              onClick={handleOpenMonitor}
-              className="px-8 py-4 bg-white text-brand-blue rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-brand-blue hover:text-white transition-all flex items-center gap-3 shrink-0 shadow-lg"
-            >
-              Abrir Monitor <ArrowRight size={20} />
-            </button>
-          </motion.div>
-        </section>
       </main>
 
 
