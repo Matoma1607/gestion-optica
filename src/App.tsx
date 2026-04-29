@@ -151,162 +151,8 @@ const SmartTooltip: React.FC<{ text: string; children: React.ReactNode; position
   );
 };
 
-const FullSummaryModal: React.FC<{
-  isOpen: boolean;
-  onClose: () => void;
-  orders: Order[];
-  filter: 'Todas' | 'Vencidas' | 'Retrasado';
-  setFilter: (f: 'Todas' | 'Vencidas' | 'Retrasado') => void;
-  selectedStage: Stage | null;
-  setSelectedStage: (s: Stage | null) => void;
-  filterCounts: Record<string, number>;
-  getStatusColor: (status: Status) => string;
-}> = ({ isOpen, onClose, orders, filter, setFilter, selectedStage, setSelectedStage, filterCounts, getStatusColor }) => {
-  const filteredOrders = useMemo(() => {
-    return orders.filter(o => {
-      const matchesFilter = filter === 'Todas' || o.status === filter;
-      const matchesStage = !selectedStage || o.stage === selectedStage;
-      return matchesFilter && matchesStage;
-    });
-  }, [orders, filter, selectedStage]);
 
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[200] bg-slate-900/95 backdrop-blur-md flex flex-col"
-        >
-          <div className="p-4 md:p-8 flex flex-col xl:flex-row justify-between items-center gap-4 md:gap-6 border-b border-white/10 shrink-0">
-            <div className="flex items-center gap-4 w-full xl:w-auto">
-              <div className="h-10 w-10 md:h-12 md:w-12 shrink-0 rounded-xl md:rounded-2xl bg-brand-blue flex items-center justify-center text-white shadow-xl shadow-brand-blue/20">
-                <ClipboardList size={22} className="md:w-7 md:h-7" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <h2 className="text-base md:text-2xl font-black text-white tracking-tight uppercase italic leading-tight truncate">Resumen de Órdenes Críticas</h2>
-                <div className="flex items-center gap-2 mt-1 md:mt-1.5">
-                  <div className="h-1.5 w-1.5 rounded-full bg-brand-green animate-pulse"></div>
-                  <p className="text-white/40 text-[8px] md:text-[9px] font-bold uppercase tracking-widest leading-none">Monitor en Tiempo Real</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col md:flex-row items-center gap-4 w-full xl:w-auto shrink-0">
-              <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10 w-full md:w-auto overflow-x-auto scrollbar-hide">
-                {(['Todas', 'Vencidas', 'Retrasado'] as const).map((f) => (
-                  <button
-                    key={f}
-                    onClick={() => setFilter(f)}
-                    className={`flex-1 md:flex-none px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-[9px] sm:text-[10px] font-black transition-all whitespace-nowrap flex items-center justify-center gap-2 ${
-                      filter === f 
-                        ? (f === 'Vencidas' ? 'bg-brand-red text-white' : f === 'Retrasado' ? 'bg-brand-orange text-white' : 'bg-white text-brand-blue') + ' shadow-lg scale-105'
-                        : 'text-white/40 hover:text-white'
-                    }`}
-                  >
-                    <span>{f}</span>
-                    {filterCounts[f] > 0 && (
-                      <span className={`flex items-center justify-center min-w-[16px] sm:min-w-[18px] h-4 sm:h-4.5 px-1 rounded-full text-[8px] sm:text-[9px] font-black ${
-                        filter === f ? 'bg-white/20 text-white' :
-                        f === 'Vencidas' ? 'bg-brand-red text-white' : 
-                        f === 'Retrasado' ? 'bg-brand-orange text-white' : 
-                        'bg-white/20 text-white'
-                      }`}>
-                        {filterCounts[f]}
-                      </span>
-                    )}
-                  </button>
-                ))}
-              </div>
-              <button 
-                onClick={onClose}
-                className="w-full md:w-auto bg-white/5 hover:bg-brand-red text-white p-2.5 md:p-3 rounded-2xl transition-all border border-white/10 hover:border-brand-red/50 group flex items-center justify-center shrink-0"
-              >
-                <X size={24} className="group-hover:rotate-90 transition-transform" />
-              </button>
-            </div>
-          </div>
-
-          <div className="flex-1 overflow-auto p-4 md:p-10 scrollbar-hide">
-            <div className="max-w-6xl mx-auto min-h-min pb-20">
-              <div className="bg-white rounded-[1.2rem] md:rounded-[2.5rem] shadow-2xl overflow-x-auto border border-white/10">
-                <table className="w-full text-left border-collapse min-w-[550px]">
-                  <thead>
-                    <tr className="bg-slate-50">
-                      <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic">Orden</th>
-                      <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic">Local</th>
-                      <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic">Etapa Actual</th>
-                      <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic text-center">T. Restante</th>
-                      <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic text-right">Estado</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-50">
-                    {filteredOrders.length > 0 ? (
-                      filteredOrders.map((order) => (
-                        <tr key={order.id} className="hover:bg-slate-50/80 transition-colors group">
-                          <td className="px-8 py-6">
-                            <span className="text-lg font-black text-brand-blue tracking-tight font-mono">#{order.id.replace('#', '')}</span>
-                          </td>
-                          <td className="px-8 py-6">
-                            <div className="flex flex-col">
-                              <span className="font-bold text-slate-800 text-base">{order.location}</span>
-                              <span className="text-[10px] text-slate-400 font-bold flex items-center gap-1 mt-0.5 uppercase tracking-wide">
-                                <Clock size={10} className="text-brand-blue" /> Prometido: {order.promisedTime}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-8 py-6">
-                            <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-tight border border-slate-200">
-                              {order.stage}
-                            </span>
-                          </td>
-                          <td className="px-8 py-6 text-center">
-                            <span className={`text-xl font-black ${
-                              order.remainingTime <= 0 ? 'text-brand-red animate-pulse' : 
-                              order.remainingTime <= 60 ? 'text-brand-orange' : 'text-brand-green'
-                            }`}>
-                              {order.remainingTime} <span className="text-xs uppercase ml-1">min</span>
-                            </span>
-                          </td>
-                          <td className="px-8 py-6 text-right">
-                            <span className={`text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-sm ${getStatusColor(order.status)}`}>
-                              {order.status}
-                            </span>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={5} className="py-20 text-center">
-                          <div className="flex flex-col items-center gap-2 opacity-30">
-                            <ClipboardList size={48} />
-                            <p className="text-sm font-black uppercase tracking-widest">Sin órdenes para mostrar</p>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-              
-              {selectedStage && (
-                <div className="mt-8 flex justify-center">
-                  <button 
-                    onClick={() => setSelectedStage(null)}
-                    className="bg-brand-blue text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-brand-blue/90 transition-all shadow-xl shadow-brand-blue/20 flex items-center gap-3"
-                  >
-                    Borrar Filtro de Etapa ({selectedStage}) <X size={16} />
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-};
+// --- Views ---
 
 const MonitorView: React.FC<{
   orders: Order[];
@@ -545,31 +391,31 @@ function StageProgressCard({ stage, count, total, colorClass, icon: Icon, isSele
   const progress = (count / total) * 100;
   return (
     <motion.div 
-      whileHover={{ y: -4, scale: 1.01 }}
+      whileHover={{ y: -2, scale: 1.01 }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
-      className={`p-6 rounded-3xl cursor-pointer transition-all border min-h-[160px] flex flex-col justify-between ${
+      className={`p-4 rounded-2xl cursor-pointer transition-all border min-h-[120px] flex flex-col justify-between ${
         isSelected 
-          ? 'bg-brand-blue border-transparent ring-4 ring-brand-blue/20 shadow-xl' 
-          : 'bg-white border-slate-100 shadow-sm hover:shadow-lg'
+          ? 'bg-brand-blue border-transparent ring-4 ring-brand-blue/10 shadow-lg' 
+          : 'bg-white border-slate-100 shadow-sm hover:shadow-md'
       }`}
     >
-      <div className="flex justify-between items-center mb-4">
-        <div className={`p-3 rounded-2xl ${isSelected ? 'bg-white/20 text-white' : `${colorClass.replace('bg-', 'bg-opacity-10 text-')}`}`}>
-          <Icon size={24} />
+      <div className="flex justify-between items-start">
+        <div className={`p-2 rounded-xl ${isSelected ? 'bg-white/20 text-white' : `${colorClass.replace('bg-', 'bg-opacity-10 text-')}`}`}>
+          <Icon size={18} />
         </div>
         <div className="text-right">
-          <span className={`text-3xl font-black ${isSelected ? 'text-white' : 'text-slate-800'}`}>{count}</span>
-          <p className={`text-[10px] font-bold uppercase tracking-widest ${isSelected ? 'text-blue-200' : 'text-slate-400'}`}>Tareas</p>
+          <span className={`text-2xl font-black ${isSelected ? 'text-white' : 'text-slate-800'}`}>{count}</span>
+          <p className={`text-[9px] font-bold uppercase tracking-widest ${isSelected ? 'text-blue-200' : 'text-slate-400'}`}>Tareas</p>
         </div>
       </div>
       
-      <div>
-        <div className={`flex justify-between items-end mb-2 ${isSelected ? 'text-blue-100' : 'text-slate-500'}`}>
-          <span className="text-xs font-black uppercase tracking-wider">{stage}</span>
-          <span className="text-[10px] font-mono font-bold opacity-70">AVANCE {Math.round(progress)}%</span>
+      <div className="mt-2">
+        <div className={`flex justify-between items-end mb-1.5 ${isSelected ? 'text-blue-100' : 'text-slate-500'}`}>
+          <span className="text-[10px] font-black uppercase tracking-wider truncate mr-2">{stage}</span>
+          <span className="text-[8px] font-mono font-bold opacity-70 shrink-0">{Math.round(progress)}%</span>
         </div>
-        <div className={`w-full h-1.5 rounded-full overflow-hidden ${isSelected ? 'bg-white/10' : 'bg-slate-100'}`}>
+        <div className={`w-full h-1 rounded-full overflow-hidden ${isSelected ? 'bg-white/10' : 'bg-slate-100'}`}>
           <motion.div 
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
@@ -583,63 +429,59 @@ function StageProgressCard({ stage, count, total, colorClass, icon: Icon, isSele
 }
 
 const LogisticsOutSection: React.FC<{ onOpenHistory: () => void }> = ({ onOpenHistory }) => (
-  <div className="bg-slate-900 text-white p-6 rounded-[2.5rem] shadow-2xl flex flex-col h-full border border-white/5 relative overflow-hidden">
+  <div className="bg-slate-900 text-white p-6 rounded-[2.5rem] shadow-2xl border border-white/5 relative overflow-hidden">
     <div className="absolute top-0 right-0 w-32 h-32 bg-brand-green/10 blur-3xl rounded-full -mr-10 -mt-10"></div>
     <div className="relative z-10 flex flex-col h-full">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-black flex items-center gap-2 uppercase tracking-tighter italic">
+        <h3 className="text-xl font-black flex items-center gap-2 uppercase tracking-tighter italic text-white/90">
           <Truck size={24} className="text-brand-green" />
           <span>TRABAJOS QUE SALIERON</span>
         </h3>
-      </div>
-      
-      <div className="space-y-4 flex-1">
-        {LOGISTICS_OUT.map((job, idx) => (
-          <SmartTooltip 
-            key={job.id} 
-            text={`Envío a sucursal ${job.destination}`} 
-            position="side" 
-            className="w-full"
-          >
-            <motion.div 
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: idx * 0.1 }}
-              className="group flex flex-col bg-white/5 p-4 rounded-3xl border border-white/10 hover:bg-white/10 transition-all hover:border-brand-green/30 cursor-default gap-3"
-            >
-              <div className="flex items-center justify-between w-full gap-2">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="h-10 w-10 shrink-0 rounded-2xl bg-brand-green/20 flex items-center justify-center text-brand-green group-hover:scale-110 transition-transform">
-                    <Truck size={18} />
-                  </div>
-                  <div className="flex flex-col min-w-0">
-                    <span className="text-[10px] text-slate-500 font-mono tracking-widest uppercase font-black truncate">ORDEN</span>
-                    <span className="text-lg font-black text-brand-green tracking-tight truncate">{job.id.replace('#', '')}</span>
-                  </div>
-                </div>
-                
-                <div className="text-right flex flex-col shrink-0">
-                  <div className="flex flex-col items-end">
-                    <span className="text-[8px] text-slate-500 font-black uppercase tracking-widest mb-0.5 whitespace-nowrap">Sucursal</span>
-                    <span className="text-[10px] text-brand-green font-black uppercase tracking-widest px-2 py-0.5 bg-brand-green/10 rounded-md border border-brand-green/20 whitespace-nowrap">{job.destination}</span>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </SmartTooltip>
-        ))}
-      </div>
-
-      <SmartTooltip text="Consulta el registro histórico de salidas" position="bottom">
         <button 
           onClick={onOpenHistory}
-          className="mt-8 w-full group relative py-4 flex items-center justify-center gap-3 text-sm font-black text-white transition-all overflow-hidden"
+          className="px-4 py-2 bg-brand-green/10 hover:bg-brand-green/20 rounded-xl text-[10px] font-black text-brand-green uppercase tracking-widest border border-brand-green/20 transition-all flex items-center gap-2"
         >
-          <div className="absolute inset-0 bg-brand-green/20 rounded-2xl group-hover:bg-brand-green/30 transition-colors"></div>
-          <span className="relative z-10 uppercase tracking-widest text-brand-green">Ver Historial</span>
-          <ArrowRight size={18} className="relative z-10 text-brand-green group-hover:translate-x-1 transition-transform" />
+          Historial <History size={14} />
         </button>
-      </SmartTooltip>
+      </div>
+      
+      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
+        {LOGISTICS_OUT.map((job, idx) => (
+          <div key={job.id} className="min-w-[280px] snap-start">
+            <SmartTooltip 
+              text={`Envío a sucursal ${job.destination}`} 
+              position="top" 
+              className="w-full"
+            >
+              <motion.div 
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                className="group flex flex-col bg-white/5 p-4 rounded-3xl border border-white/10 hover:bg-white/10 transition-all hover:border-brand-green/30 cursor-default gap-3"
+              >
+                <div className="flex items-center justify-between w-full gap-2">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="h-10 w-10 shrink-0 rounded-2xl bg-brand-green/20 flex items-center justify-center text-brand-green group-hover:scale-110 transition-transform">
+                      <Truck size={18} />
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[10px] text-slate-500 font-mono tracking-widest uppercase font-black truncate">ORDEN</span>
+                      <span className="text-lg font-black text-brand-green tracking-tight truncate">{job.id.replace('#', '')}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="text-right flex flex-col shrink-0">
+                    <div className="flex flex-col items-end">
+                      <span className="text-[8px] text-slate-500 font-black uppercase tracking-widest mb-0.5 whitespace-nowrap">Sucursal</span>
+                      <span className="text-[10px] text-brand-green font-black uppercase tracking-widest px-2 py-0.5 bg-brand-green/10 rounded-md border border-brand-green/20 whitespace-nowrap">{job.destination}</span>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </SmartTooltip>
+          </div>
+        ))}
+      </div>
     </div>
   </div>
 );
@@ -649,7 +491,6 @@ const LogisticsOutSection: React.FC<{ onOpenHistory: () => void }> = ({ onOpenHi
 export default function App() {
   const [filter, setFilter] = useState<'Todas' | 'Vencidas' | 'Retrasado'>('Todas');
   const [showHistory, setShowHistory] = useState(false);
-  const [showFullSummary, setShowFullSummary] = useState(false);
   const [selectedStage, setSelectedStage] = useState<Stage | null>(null);
   const [orders] = useState<Order[]>(INITIAL_ORDERS);
 
@@ -741,77 +582,214 @@ export default function App() {
     <div className="min-h-screen pb-12 flex flex-col bg-slate-50">
       <Header />
       
-      <main className="flex-1 w-full px-4 mt-6 space-y-6">
+      <main className="flex-1 w-full px-4 mt-6 space-y-8">
         
-        {/* Top Section: Progress Cards (3x2) and Sidebar */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Top Section: Progress Cards and Logistics in horizontal strips */}
+        <div className="space-y-8">
           
-          {/* Tarjetas de Etapas (3x2 Grid) */}
-          <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-            {stats.map((stat: { stage: string; count: number; total: number }, idx: number) => (
-              <SmartTooltip 
-                key={stat.stage} 
-                text={`Pedidos esperando en ${stat.stage}`}
-                position="bottom"
-              >
-                <StageProgressCard 
-                  stage={stat.stage} 
-                  count={stat.count} 
-                  total={stat.total}
-                  isSelected={selectedStage === stat.stage || (stat.stage === 'General' && !selectedStage)}
-                  onClick={() => {
-                    if (stat.stage === 'General') {
-                      setSelectedStage(null);
-                    } else {
-                      setSelectedStage(selectedStage === stat.stage ? null : stat.stage as Stage);
-                    }
-                  }}
-                  icon={getStageIcon(stat.stage as Stage)}
-                  colorClass={
-                    stat.stage === 'General' ? 'bg-brand-blue' :
-                    idx % 6 === 0 ? 'bg-blue-500' : 
-                    idx % 6 === 1 ? 'bg-indigo-500' : 
-                    idx % 6 === 2 ? 'bg-purple-500' : 
-                    idx % 6 === 3 ? 'bg-pink-500' : 
-                    idx % 6 === 4 ? 'bg-brand-green' : 'bg-brand-orange'
-                  }
-                />
-              </SmartTooltip>
-            ))}
-          </div>
+          {/* Tarjetas de Etapas (Laboratory Panel - Horizontal Scroll) */}
+          <section>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-black flex items-center gap-2 uppercase tracking-tighter italic text-slate-800">
+                <Layers size={21} className="text-brand-blue" />
+                <span>Estado de Laboratorio</span>
+              </h3>
+              <div className="text-[9px] font-black bg-brand-blue/10 text-brand-blue px-3 py-1 rounded-full uppercase tracking-widest border border-brand-blue/20">
+                {stats.length} Procesos
+              </div>
+            </div>
+            
+            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
+              {stats.map((stat: { stage: string; count: number; total: number }, idx: number) => (
+                <div key={stat.stage} className="min-w-[280px] md:min-w-[320px] snap-start">
+                  <SmartTooltip 
+                    text={`Pedidos esperando en ${stat.stage}`}
+                    position="bottom"
+                  >
+                    <StageProgressCard 
+                      stage={stat.stage} 
+                      count={stat.count} 
+                      total={stat.total}
+                      isSelected={selectedStage === stat.stage || (stat.stage === 'General' && !selectedStage)}
+                      onClick={() => {
+                        if (stat.stage === 'General') {
+                          setSelectedStage(null);
+                        } else {
+                          setSelectedStage(selectedStage === stat.stage ? null : stat.stage as Stage);
+                        }
+                      }}
+                      icon={getStageIcon(stat.stage as Stage)}
+                      colorClass={
+                        stat.stage === 'General' ? 'bg-brand-blue' :
+                        idx % 6 === 0 ? 'bg-blue-500' : 
+                        idx % 6 === 1 ? 'bg-indigo-500' : 
+                        idx % 6 === 2 ? 'bg-purple-500' : 
+                        idx % 6 === 3 ? 'bg-pink-500' : 
+                        idx % 6 === 4 ? 'bg-brand-green' : 'bg-brand-orange'
+                      }
+                    />
+                  </SmartTooltip>
+                </div>
+              ))}
+            </div>
+          </section>
 
-          {/* Panel Lateral de Logística */}
-          <div className="lg:col-span-4 h-full">
-            <LogisticsOutSection onOpenHistory={() => setShowHistory(true)} />
-          </div>
+          {/* Panel de Logística (Salidas Recientes - Compacto) */}
+          <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+            <div className="lg:col-span-12">
+               <LogisticsOutSection onOpenHistory={() => setShowHistory(true)} />
+            </div>
+          </section>
         </div>
 
-        {/* Bottom Section: Main Access to Monitor */}
-        <section className="mt-12">
-          <motion.button 
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={handleOpenMonitor}
-            className="w-full bg-brand-blue p-8 md:p-12 rounded-[3.5rem] shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8 group relative overflow-hidden text-white border border-white/10"
+        {/* Breakdown Summary Section (Persistent Table Below) */}
+        <section className="mt-12 space-y-6">
+          <div className="flex flex-col md:flex-row justify-between items-end gap-6">
+            <div>
+              <h2 className="text-3xl font-black text-slate-900 tracking-tight uppercase italic flex items-center gap-3">
+                <ClipboardList size={32} className="text-brand-blue" />
+                Resumen de Órdenes
+              </h2>
+              <p className="text-slate-500 font-medium mt-1">Desglose detallado de todos los pedidos en curso.</p>
+            </div>
+
+            <div className="flex bg-white p-1 rounded-2xl border border-slate-200 shadow-sm overflow-x-auto scrollbar-hide max-w-full">
+              {(['Todas', 'Vencidas', 'Retrasado'] as const).map((f) => (
+                <button
+                  key={f}
+                  onClick={() => setFilter(f)}
+                  className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all whitespace-nowrap flex items-center justify-center gap-2 ${
+                    filter === f 
+                      ? (f === 'Vencidas' ? 'bg-brand-red text-white' : f === 'Retrasado' ? 'bg-brand-orange text-white' : 'bg-brand-blue text-white') + ' shadow-lg scale-105'
+                      : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
+                  }`}
+                >
+                  <span>{f}</span>
+                  {filterCounts[f] > 0 && (
+                    <span className={`flex items-center justify-center min-w-[18px] h-4.5 px-1 rounded-full text-[9px] font-black ${
+                      filter === f ? 'bg-white/20 text-white' :
+                      f === 'Vencidas' ? 'bg-brand-red text-white' : 
+                      f === 'Retrasado' ? 'bg-brand-orange text-white' : 
+                      'bg-slate-100 text-slate-500'
+                    }`}>
+                      {filterCounts[f]}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-slate-100">
+            <div className="overflow-x-auto w-full">
+              <table className="w-full text-left border-collapse min-w-[800px]">
+                <thead>
+                  <tr className="bg-slate-50">
+                    <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic">Orden</th>
+                    <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic">Local</th>
+                    <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic">Etapa Actual</th>
+                    <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic text-center">T. Restante</th>
+                    <th className="px-8 py-5 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 italic text-right">Estado</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  <AnimatePresence mode="popLayout" initial={false}>
+                    {filteredOrders.length > 0 ? (
+                      filteredOrders.map((order, idx) => (
+                        <motion.tr 
+                          key={order.id}
+                          layout
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.98 }}
+                          transition={{ duration: 0.2, delay: Math.min(idx * 0.02, 0.2) }}
+                          className="hover:bg-slate-50/80 transition-colors group"
+                        >
+                          <td className="px-8 py-6">
+                            <span className="text-lg font-black text-brand-blue tracking-tight font-mono">#{order.id.replace('#', '')}</span>
+                          </td>
+                          <td className="px-8 py-6">
+                            <div className="flex flex-col">
+                              <span className="font-bold text-slate-800 text-base">{order.location}</span>
+                              <span className="text-[10px] text-slate-400 font-bold flex items-center gap-1 mt-0.5 uppercase tracking-wide">
+                                <Clock size={10} className="text-brand-blue" /> Prometido: {order.promisedTime}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-8 py-6">
+                            <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-tight border border-slate-200">
+                              {order.stage}
+                            </span>
+                          </td>
+                          <td className="px-8 py-6 text-center">
+                            <span className={`text-xl font-black ${
+                              order.remainingTime <= 0 ? 'text-brand-red animate-pulse' : 
+                              order.remainingTime <= 60 ? 'text-brand-orange' : 'text-brand-green'
+                            }`}>
+                              {order.remainingTime} <span className="text-xs uppercase ml-1">min</span>
+                            </span>
+                          </td>
+                          <td className="px-8 py-6 text-right">
+                            <span className={`text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-sm ${getStatusColor(order.status)}`}>
+                              {order.status}
+                            </span>
+                          </td>
+                        </motion.tr>
+                      ))
+                    ) : (
+                      <motion.tr
+                        key="empty"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                      >
+                        <td colSpan={5} className="py-20 text-center">
+                          <div className="flex flex-col items-center gap-2 opacity-30">
+                            <ClipboardList size={48} />
+                            <p className="text-sm font-black uppercase tracking-widest">Sin órdenes para mostrar</p>
+                            {selectedStage && (
+                              <button 
+                                onClick={() => setSelectedStage(null)}
+                                className="mt-4 text-brand-blue font-black underline uppercase text-[10px]"
+                              >
+                                Limpiar filtro de etapa
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </motion.tr>
+                    )}
+                  </AnimatePresence>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        {/* Monitor Access (Secondary UI) */}
+        <section className="pt-8">
+          <motion.div 
+            whileHover={{ y: -4 }}
+            className="bg-slate-900 p-8 md:p-10 rounded-[3rem] shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8 group border border-white/5"
           >
-            <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 blur-3xl rounded-full -mr-32 -mt-32 transition-transform group-hover:scale-150 duration-700"></div>
-            <div className="relative z-10 flex items-center gap-8 min-w-0">
-              <div className="h-20 w-20 shrink-0 rounded-[2rem] bg-white/10 flex items-center justify-center text-white border border-white/20 group-hover:bg-brand-green group-hover:text-white transition-all duration-500 shadow-xl group-hover:shadow-brand-green/40">
-                <ExternalLink size={36} />
+            <div className="flex items-center gap-6 min-w-0">
+              <div className="h-16 w-16 shrink-0 rounded-2xl bg-white/10 flex items-center justify-center text-white border border-white/20 group-hover:bg-brand-blue transition-all duration-500 shadow-xl">
+                <ExternalLink size={28} />
               </div>
               <div className="text-left min-w-0">
-                <h2 className="text-3xl md:text-4xl font-black italic tracking-tighter uppercase leading-tight">Monitor de Órdenes Detallado</h2>
-                <p className="text-white/60 text-lg font-medium mt-2 max-w-xl">Abre el panel de control extendido en una nueva pestaña para visualizar en un monitor secundario con máxima claridad.</p>
+                <h3 className="text-2xl font-black italic tracking-tight uppercase text-white">Modo Monitor Extendido</h3>
+                <p className="text-white/40 text-sm font-medium mt-1">Perfecto para una segunda pantalla dedicada en el taller o recepción.</p>
               </div>
             </div>
-            <div className="relative z-10 shrink-0">
-              <div className="px-10 py-5 bg-white text-brand-blue rounded-3xl font-black uppercase tracking-[0.2em] text-sm shadow-[0_20px_40px_-5px_rgba(255,255,255,0.3)] group-hover:bg-brand-green group-hover:text-white transition-all flex items-center gap-4">
-                Abrir Monitor Central <ArrowRight size={24} />
-              </div>
-            </div>
-          </motion.button>
+            <button 
+              onClick={handleOpenMonitor}
+              className="px-8 py-4 bg-white text-brand-blue rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-brand-blue hover:text-white transition-all flex items-center gap-3 shrink-0 shadow-lg"
+            >
+              Abrir Monitor <ArrowRight size={20} />
+            </button>
+          </motion.div>
         </section>
       </main>
+
 
       {/* History Modal Overlay */}
       <AnimatePresence>
@@ -891,17 +869,7 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      <FullSummaryModal 
-        isOpen={showFullSummary}
-        onClose={() => setShowFullSummary(false)}
-        orders={orders}
-        filter={filter}
-        setFilter={setFilter}
-        selectedStage={selectedStage}
-        setSelectedStage={setSelectedStage}
-        filterCounts={filterCounts}
-        getStatusColor={getStatusColor}
-      />
+      {/* Breakdown Summary Section (Persistent Table Below) */}
 
       <footer className="mt-auto py-10 text-center text-slate-400 text-xs font-medium">
         <p>© 2026 Sistema de Gestión de Laboratorio Óptico v1.0.0-Beta</p>
