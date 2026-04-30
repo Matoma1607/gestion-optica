@@ -130,6 +130,29 @@ const INITIAL_ORDERS: Order[] = [
   { id: '#11409', location: 'Yerba Buena', promisedTime: '12:15', stage: 'Logística', remainingTime: 15, status: 'Retrasado' },
   { id: '#11410', location: 'Concepción', promisedTime: '12:30', stage: 'Calibrado', remainingTime: 180, status: 'A tiempo' },
   { id: '#11411', location: 'Aguilares', promisedTime: '13:00', stage: 'Superficie', remainingTime: 45, status: 'A tiempo' },
+  { id: '#11412', location: '9 de Julio', promisedTime: '13:15', stage: 'Cristales', remainingTime: 20, status: 'Retrasado' },
+  { id: '#11413', location: 'Maipú', promisedTime: '13:30', stage: 'Calibrado', remainingTime: 15, status: 'Retrasado' },
+  { id: '#11414', location: 'Yerba Buena', promisedTime: '13:45', stage: 'Logística', remainingTime: -10, status: 'Vencida' },
+  { id: '#11415', location: 'Solmar Alem', promisedTime: '14:00', stage: 'Antireflejo', remainingTime: 120, status: 'A tiempo' },
+  { id: '#11416', location: 'Solmar Mendoza', promisedTime: '14:15', stage: 'Superficie', remainingTime: 60, status: 'A tiempo' },
+  { id: '#11417', location: 'Junín', promisedTime: '14:30', stage: 'Cristales', remainingTime: 45, status: 'Retrasado' },
+  { id: '#11418', location: 'Lutz Ferrando', promisedTime: '14:45', stage: 'Logística', remainingTime: 10, status: 'Retrasado' },
+  { id: '#11419', location: '24 de Septiembre', promisedTime: '15:00', stage: 'Calibrado', remainingTime: 180, status: 'A tiempo' },
+  { id: '#11420', location: 'Aguilares', promisedTime: '15:15', stage: 'Superficie', remainingTime: -45, status: 'Vencida' },
+  { id: '#11421', location: '9 de Julio', promisedTime: '15:30', stage: 'Logística', remainingTime: 120, status: 'A tiempo' },
+  { id: '#11422', location: 'Maipú', promisedTime: '15:45', stage: 'Cristales', remainingTime: 30, status: 'Retrasado' },
+  { id: '#11423', location: 'Yerba Buena', promisedTime: '16:00', stage: 'Superficie', remainingTime: -15, status: 'Vencida' },
+  { id: '#11424', location: 'Concepción', promisedTime: '16:15', stage: 'Calibrado', remainingTime: 45, status: 'A tiempo' },
+  { id: '#11425', location: 'Solmar Alem', promisedTime: '16:30', stage: 'Antireflejo', remainingTime: 10, status: 'Retrasado' },
+  { id: '#11426', location: 'Solmar Mendoza', promisedTime: '16:45', stage: 'Logística', remainingTime: 15, status: 'Retrasado' },
+  { id: '#11427', location: 'Junín', promisedTime: '17:00', stage: 'Superficie', remainingTime: 90, status: 'A tiempo' },
+  { id: '#11428', location: 'Lutz Ferrando', promisedTime: '17:15', stage: 'Cristales', remainingTime: 50, status: 'A tiempo' },
+  { id: '#11429', location: '24 de Septiembre', promisedTime: '17:30', stage: 'Calibrado', remainingTime: -5, status: 'Vencida' },
+  { id: '#11430', location: 'Aguilares', promisedTime: '17:45', stage: 'Superficie', remainingTime: 45, status: 'A tiempo' },
+  { id: '#11431', location: '9 de Julio', promisedTime: '18:00', stage: 'Cristales', remainingTime: 30, status: 'Retrasado' },
+  { id: '#11432', location: 'Maipú', promisedTime: '18:15', stage: 'Calibrado', remainingTime: 120, status: 'A tiempo' },
+  { id: '#11433', location: 'Solmar Mendoza', promisedTime: '18:30', stage: 'Logística', remainingTime: 15, status: 'Retrasado' },
+  { id: '#11434', location: 'Yerba Buena', promisedTime: '18:45', stage: 'Antireflejo', remainingTime: 60, status: 'A tiempo' },
 ];
 
 const LOGISTICS_OUT: { id: string; destination: string; exitTime: string; items: string[] }[] = [
@@ -671,8 +694,8 @@ export default function App() {
             
             {/* Panel 1 */}
             <section className="space-y-4">
-              <div className="bg-white rounded-[2.5rem] shadow-none overflow-hidden border border-slate-200/60 flex flex-col min-h-[500px]">
-                <div className="flex-1 p-4 overflow-y-auto max-h-[1400px] scrollbar-thin scrollbar-thumb-slate-200">
+              <div className="bg-white rounded-[2.5rem] shadow-none overflow-hidden border border-slate-200/60 flex flex-col min-h-[850px]">
+                <div className="flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {/* Sub-Panel 1A */}
                     <div className="space-y-1.5">
@@ -699,8 +722,8 @@ export default function App() {
 
             {/* Panel 2 */}
             <section className="space-y-4 flex flex-col h-full overflow-hidden">
-              <div className="bg-white rounded-[2.5rem] shadow-none overflow-hidden border border-slate-200/60 flex flex-col min-h-[500px]">
-                <div className="flex-1 p-4 overflow-y-auto max-h-[1400px] scrollbar-thin scrollbar-thumb-slate-200">
+              <div className="bg-white rounded-[2.5rem] shadow-none overflow-hidden border border-slate-200/60 flex flex-col min-h-[850px]">
+                <div className="flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {/* Sub-Panel 2A */}
                     <div className="space-y-1.5">
